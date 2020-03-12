@@ -1,8 +1,8 @@
-#Ohjelmistotekniikka-kurssin harjoitustyö
+# Ohjelmistotekniikka-kurssin harjoitustyö
 
-##Toinen otsikko
+## Toinen otsikko
 * **Tekijä:** Okko Kuisma
 * **Kyllä:** Joo
 
-##Kolmas otsikko
+## Kolmas otsikko
 Tietoa sovelluksesta tulossa myöhemmin, kun tiedän, *minkälaisen sovelluksen toteutan.*
