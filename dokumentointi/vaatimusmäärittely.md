@@ -14,5 +14,4 @@ Alkuvaiheessa sovelluksella on yksi käyttäjärooli, pääkäyttäjä, jolla on
 
 ## Jatkokehitysideoita
 * Opettajille käyttäjärooli, jolla oikeudet tarkastella omien kurssien luentojen aikatauluja ja omille kursseilla ilmoittautuneita opiskelijoita
-* Näkee omien kurssien opiskelijat ja luentojen aikataulut
 * Kalenterinäkymä, josta näkyy tiettynä päivänä tai viikkona järjetettävä opetus
