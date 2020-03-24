@@ -9,6 +9,6 @@ Sovelluksen avulla opiston tai koulun on mahdollista pitää kirjaa sen järjest
 [komentorivi.txt](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/laskarit/viikko1/komentorivi.txt)
 
 ## Dokumentaatio
-[Vaativuusmäärittely][https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/vaatimusm%C3%A4%C3%A4rittely.md]
+[Vaativuusmäärittely](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/vaatimusm%C3%A4%C3%A4rittely.md)
 
 
