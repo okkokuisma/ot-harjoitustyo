@@ -12,11 +12,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import kurssihallinta.database.Database;
+import kurssihallinta.domain.Student;
 
 /**
  *
@@ -79,15 +81,23 @@ public class StudentsView {
         });
         
         // PANE FOR CONTROLS USED TO SEARCH FOR STUDENTS
-        GridPane studentSearchView = new GridPane();
-        studentSearchView.setVgap(15);
-        studentSearchView.setAlignment(Pos.TOP_CENTER);
         
-        TextField textField = new TextField("Search for students");
+        TextField searchTextfield = new TextField("Search by name");
         Button searchButton = new Button("Search");
         
-        studentSearchView.add(textField, 0, 0);
-        studentSearchView.add(searchButton, 1, 0);
+        searchTextfield.setOnMouseClicked((event) -> {
+            searchTextfield.clear();
+        });
+        
+        searchButton.setOnMouseClicked((event) -> {
+            TableView<Student> table;
+            try {
+                table = db.searchStudents(searchTextfield.getText());
+                studentsView.setCenter(table);
+            } catch (SQLException ex) {
+                Logger.getLogger(StudentsView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         
         //PANE FOR CONTROLS USED FOR NAVIGATING BETWEEN SEARCH AND ADD PANES
         HBox navigationBar = new HBox();
@@ -95,22 +105,25 @@ public class StudentsView {
         navigationBar.setSpacing(10);
         
         Button navigationButton = new Button("Add a new student");
-        navigationBar.getChildren().add(navigationButton);
+        navigationBar.getChildren().addAll(searchTextfield, searchButton, navigationButton);
         
         navigationButton.setOnMouseClicked((event) -> { 
             if (searchView) {
                 studentsView.setCenter(studentAddView);
                 navigationButton.setText("Search for students");
+                searchTextfield.setVisible(false);
+                searchButton.setVisible(false);
                 searchView = false;
             } else {
-                studentsView.setCenter(studentSearchView);
+                studentsView.setCenter(null);
+                searchTextfield.setVisible(true);
+                searchButton.setVisible(true);
                 navigationButton.setText("Add a new student");
                 searchView = true;
             }
         });
         
         studentsView.setTop(navigationBar);
-        studentsView.setCenter(studentSearchView);
         
         return studentsView;
     }
