@@ -5,6 +5,9 @@
  */
 package kurssihallinta.ui;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -13,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import kurssihallinta.database.Database;
 
 /**
  *
@@ -20,9 +24,11 @@ import javafx.scene.layout.HBox;
  */
 public class StudentsView {
     private boolean searchView;
+    Database db;
     
-    public StudentsView() {
+    public StudentsView(Database db) {
         searchView = true;
+        this.db = db;
     }
     
     public Parent getParent() {
@@ -34,26 +40,43 @@ public class StudentsView {
         studentAddView.setHgap(10);
         studentAddView.setAlignment(Pos.TOP_CENTER);
         
-        studentAddView.add(new Label("First name:"), 0, 0);
-        studentAddView.add(new TextField(), 1, 0);
-        studentAddView.add(new Label("Surname:"), 0, 1);
-        studentAddView.add(new TextField(), 1, 1);
-        studentAddView.add(new Label("Personal ID number:"), 0, 2);
-        studentAddView.add(new TextField(), 1, 2);
-        studentAddView.add(new Label("Home address:"), 0, 3);
-        studentAddView.add(new TextField(), 1, 3);
-        studentAddView.add(new Label("ZIP code:"), 0, 4);
-        studentAddView.add(new TextField(), 1, 4);
-        studentAddView.add(new Label("City:"), 0, 5);
-        studentAddView.add(new TextField(), 1, 5);
-        studentAddView.add(new Label("Country:"), 0, 6);
-        studentAddView.add(new TextField(), 1, 6);
-        studentAddView.add(new Label("Email:"), 0, 7);
-        studentAddView.add(new TextField(), 1, 7);
+        TextField firstNameTextfield = new TextField();
+        studentAddView.addRow(0, new Label("First name:"), firstNameTextfield);
+        TextField surnameTextfield = new TextField();
+        studentAddView.addRow(1, new Label("Surname:"), surnameTextfield);
+        TextField idTextfield = new TextField();
+        studentAddView.addRow(2, new Label("Personal ID number:"), idTextfield);
+        TextField addressTextfield = new TextField();
+        studentAddView.addRow(3, new Label("Home address:"), addressTextfield);
+        TextField zipTextfield = new TextField();
+        studentAddView.addRow(4, new Label("ZIP code:"), zipTextfield);
+        TextField cityTextfield = new TextField();
+        studentAddView.addRow(5, new Label("City:"), cityTextfield);
+        TextField countryTextfield = new TextField();
+        studentAddView.addRow(6, new Label("Country:"), countryTextfield);
+        TextField emailTextfield = new TextField();
+        studentAddView.addRow(7, new Label("Email:"), emailTextfield);
         
-        studentAddView.add(new Button("Add to database"), 0, 8);
+        Button addButton = new Button("Add to database");
         Label message = new Label();
-        studentAddView.add(message, 1, 8);
+        studentAddView.addRow(8, addButton, message);
+        
+        addButton.setOnMouseClicked((event) -> {
+            try {
+                db.addStudent(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
+                firstNameTextfield.clear();
+                surnameTextfield.clear();
+                idTextfield.clear();
+                addressTextfield.clear();
+                zipTextfield.clear();
+                cityTextfield.clear();
+                countryTextfield.clear();
+                emailTextfield.clear();
+                message.setText("Added successfully to database");
+            } catch (SQLException ex) {
+                message.setText("Error: ");
+            }
+        });
         
         // PANE FOR CONTROLS USED TO SEARCH FOR STUDENTS
         GridPane studentSearchView = new GridPane();

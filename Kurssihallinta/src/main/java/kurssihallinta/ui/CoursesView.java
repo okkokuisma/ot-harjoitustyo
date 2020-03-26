@@ -5,6 +5,7 @@
  */
 package kurssihallinta.ui;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -17,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import kurssihallinta.database.Database;
 
 /**
  *
@@ -25,10 +27,12 @@ import javafx.scene.layout.HBox;
 public class CoursesView {
     private  boolean searchView;
     private Calendar calendar;
+    Database db;
     
-    public CoursesView() {
+    public CoursesView(Database db) {
         searchView = true;
         calendar = Calendar.getInstance();
+        this.db = db;
     }
     
     public Parent getParent() {
@@ -40,23 +44,30 @@ public class CoursesView {
         courseAddView.setHgap(10);
         courseAddView.setAlignment(Pos.TOP_CENTER);
         
-        courseAddView.addRow(0, new Label("Name:"), new TextField());        
+        TextField nameTextfield = new TextField();
+        courseAddView.addRow(0, new Label("Name:"), nameTextfield);        
         DatePicker startDate = new DatePicker();
         courseAddView.addRow(1, new Label("Starting day:"), startDate); 
         DatePicker endDate = new DatePicker();
         courseAddView.addRow(2, new Label("Ending date:"), endDate);
-        courseAddView.addRow(3, new Label("Teacher:"), new TextField());
+        TextField teacherTextfield = new TextField();
+        courseAddView.addRow(3, new Label("Teacher:"), teacherTextfield);
         
-        courseAddView.add(new Button("Add to database"), 0, 4);
+        Button addButton = new Button("Add to database");
         Label message = new Label();
-        courseAddView.add(message, 1, 4);
+        courseAddView.addRow(4, addButton, message);
+        
+        addButton.setOnMouseClicked((event) -> { 
+            db.addCourse(nameTextfield.getText(), startDate.getValue().format(DateTimeFormatter.ISO_DATE), endDate.getValue().format(DateTimeFormatter.ISO_DATE), teacherTextfield.getText());
+            
+        });
         
         // PANE FOR CONTROLS USED TO SEARCH FOR COURSES
         GridPane courseSearchView = new GridPane();
         courseSearchView.setVgap(15);
         courseSearchView.setAlignment(Pos.TOP_CENTER);
         
-        TextField textField = new TextField("Search for students");
+        TextField textField = new TextField("Search for courses");
         Button searchButton = new Button("Search");
         
         courseSearchView.add(textField, 0, 0);

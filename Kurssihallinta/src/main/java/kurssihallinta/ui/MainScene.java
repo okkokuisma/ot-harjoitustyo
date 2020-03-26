@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import kurssihallinta.database.Database;
 
 
 /**
@@ -19,11 +20,18 @@ import javafx.stage.Stage;
  * @author okkokuisma
  */
 public class MainScene extends Application {
+    private Database db;
+    
+    @Override
+    public void init() {
+        db = new Database();
+        db.connect();
+    }
 
     @Override
     public void start(Stage stage) {
-        CoursesView coursesView = new CoursesView();
-        StudentsView studentsView = new StudentsView();
+        CoursesView coursesView = new CoursesView(db);
+        StudentsView studentsView = new StudentsView(db);
         
         BorderPane corePane = new BorderPane();
         
