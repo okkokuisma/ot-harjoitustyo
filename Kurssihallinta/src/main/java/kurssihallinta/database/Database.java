@@ -64,7 +64,7 @@ public class Database {
     }
     
     public boolean addCourse(String name, String startDate, String endDate, String teacher, int maxStudents) throws SQLException {    
-        PreparedStatement ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher,students, max_students) VALUES (?,?,?,?,?,?)");
+        PreparedStatement ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher,students,max_students) VALUES (?,?,?,?,?,?)");
         ps.setString(1, name);
         ps.setString(2, startDate);
         ps.setString(3, endDate);
