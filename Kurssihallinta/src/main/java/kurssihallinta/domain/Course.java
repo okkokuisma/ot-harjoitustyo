@@ -15,17 +15,26 @@ import javafx.beans.property.StringProperty;
  * @author okkokuisma
  */
 public class Course {
+    private int dbId;
     private String name;
 //    private StringProperty nameSP;
     private LocalDate startDate;
     private LocalDate endDate;
     private String teacher;
+    private int students;
+    private int maxStudents;
+    
+    public Course() {       
+    }
 
-    public Course(String name, LocalDate startDate, LocalDate endDate, String teacher) {
+    public Course(int dbId, String name, LocalDate startDate, LocalDate endDate, String teacher, int maxStudents) {
+        this.dbId = dbId;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.teacher = teacher;
+        this.students = 0;
+        this.maxStudents = maxStudents;
 //        nameSP = new SimpleStringProperty(this, "name");
 //        nameSP.set(name);
     }
@@ -64,6 +73,18 @@ public class Course {
 
     public void setTeacher(String teacher) {
         this.teacher = teacher;
+    }
+    
+    public int getDbId() {
+        return dbId;
+    }
+
+    public int getStudents() {
+        return students;
+    }
+
+    public int getMaxStudents() {
+        return maxStudents;
     }
     
     

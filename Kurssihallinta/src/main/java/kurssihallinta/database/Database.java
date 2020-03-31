@@ -34,9 +34,10 @@ public class Database {
         try {
             db = DriverManager.getConnection("jdbc:sqlite:database.db");
             Statement s = db.createStatement();
-            s.execute("CREATE TABLE Courses (id INTEGER PRIMARY KEY, name TEXT UNIQUE, startdate TEXT, enddate TEXT, teacher TEXT)");
+            s.execute("CREATE TABLE Courses (id INTEGER PRIMARY KEY, name TEXT UNIQUE, startdate TEXT, enddate TEXT, teacher TEXT, students INTEGER, max_students INTEGER)");
             s.execute("CREATE TABLE Students (id INTEGER PRIMARY KEY, first_name TEXT, surname TEXT, id_number TEXT UNIQUE, address TEXT, zip TEXT, city TEXT, country TEXT, email TEXT)");
             s.execute("CREATE TABLE Classrooms (id INTEGER PRIMARY KEY, name TEXT UNIQUE)");
+            s.execute("CREATE TABLE Registrations (id INTEGER PRIMARY KEY, course_id INTEGER, student_id INTEGER)");
             s.execute("CREATE TABLE Lessons (id INTEGER PRIMARY KEY, course_id INTEGER, classroom_id INTEGER, date TEXT, starttime TEXT, endtime TEXT)");
         } catch (SQLException ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,77 +58,59 @@ public class Database {
         return true;
     }
     
-    public boolean addCourse(String name, String startDate, String endDate, String teacher) throws SQLException {    
-        PreparedStatement ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher) VALUES (?,?,?,?)");
+    public boolean addCourse(String name, String startDate, String endDate, String teacher, int maxStudents) throws SQLException {    
+        PreparedStatement ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher,students, max_students) VALUES (?,?,?,?,?,?)");
         ps.setString(1, name);
         ps.setString(2, startDate);
         ps.setString(3, endDate);
         ps.setString(4, teacher);
-        ps.execute();
+        ps.setInt(5, 0);
+        ps.setInt(6, maxStudents);
+        ps.execute();  
         return true;
     }
     
-    public TableView searchCourses(String searchWord) throws SQLException {
+    public boolean addRegistration(int courseId) throws SQLException {
+        Statement s = db.createStatement();
+        ResultSet queryResults = s.executeQuery("SELECT id FROM Students ORDER BY id DESC LIMIT 1");
+        int studentId = queryResults.getInt(1);
+        
+        PreparedStatement ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
+        ps.setInt(1, courseId);
+        ps.setInt(2, studentId);
+        ps.execute();  
+        return true;
+    }
+    
+    public ObservableList searchCourses(String searchWord) throws SQLException {
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE name LIKE '%" + searchWord + "%'");
 
         ResultSet queryResults = ps.executeQuery();
         
-        // CREATE A TABLEVIEW OBJECT FROM QUERY RESULTS
-        TableView<Course> table = new TableView<>();
+        // CREATE A LIST OBJECT FROM QUERY RESULTS
         ObservableList<Course> courses = FXCollections.observableArrayList();
         while (queryResults.next()) {
             LocalDate startDate = LocalDate.parse(queryResults.getString(3));
             LocalDate endDate = LocalDate.parse(queryResults.getString(4));
-            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5));
+            Course course = new Course(queryResults.getInt(1), queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(7));
             courses.add(course);
         }
-        table.setItems(courses);
         
-        TableColumn<Course,String> nameCol = new TableColumn<Course,String>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
-        TableColumn<Course,String> startDateCol = new TableColumn<Course,String>("Start date");
-        startDateCol.setCellValueFactory(new PropertyValueFactory("startDate"));
-        TableColumn<Course,String> endDateCol = new TableColumn<Course,String>("End date");
-        endDateCol.setCellValueFactory(new PropertyValueFactory("endDate"));
-        TableColumn<Course,String> teacherCol = new TableColumn<Course,String>("Teacher");
-        teacherCol.setCellValueFactory(new PropertyValueFactory("teacher"));
-        table.getColumns().setAll(nameCol, startDateCol, endDateCol, teacherCol);
-        
-        return table;
+        return courses;
     }
     
-    public TableView searchStudents(String searchWord) throws SQLException {
+    public ObservableList searchStudents(String searchWord) throws SQLException {
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE first_name LIKE '%" + searchWord + "%' OR surname LIKE '%" + searchWord + "%'");
 
         ResultSet queryResults = ps.executeQuery();
         
-        // CREATE A TABLEVIEW OBJECT FROM QUERY RESULTS
-        TableView<Student> table = new TableView<>();
+        // CREATE A LIST OBJECT FROM QUERY RESULTS
         ObservableList<Student> students = FXCollections.observableArrayList();
         while (queryResults.next()) {
-            Student student = new Student(queryResults.getString(2), queryResults.getString(3), queryResults.getString(4), queryResults.getString(5), queryResults.getString(6), queryResults.getString(7), queryResults.getString(8), queryResults.getString(9));
+            Student student = new Student(queryResults.getInt(1),queryResults.getString(2), queryResults.getString(3), queryResults.getString(4), queryResults.getString(5), queryResults.getString(6), queryResults.getString(7), queryResults.getString(8), queryResults.getString(9));
             students.add(student);
         }
-        table.setItems(students);
         
-        TableColumn<Student,String> firstNameCol = new TableColumn<>("First name");
-        firstNameCol.setCellValueFactory(new PropertyValueFactory("firstName"));
-        TableColumn<Student,String> surnameCol = new TableColumn<>("Surname");
-        surnameCol.setCellValueFactory(new PropertyValueFactory("surname"));
-        TableColumn<Student,String> idCol = new TableColumn<>("Personal ID");
-        idCol.setCellValueFactory(new PropertyValueFactory("id"));
-        TableColumn<Student,String> addressCol = new TableColumn<>("Home address");
-        addressCol.setCellValueFactory(new PropertyValueFactory("address"));
-        TableColumn<Student,String> zipCol = new TableColumn<>("ZIP code");
-        zipCol.setCellValueFactory(new PropertyValueFactory("zipCode"));
-        TableColumn<Student,String> cityCol = new TableColumn<>("City");
-        cityCol.setCellValueFactory(new PropertyValueFactory("city"));
-        TableColumn<Student,String> countryCol = new TableColumn<>("Country");
-        countryCol.setCellValueFactory(new PropertyValueFactory("country"));
-        TableColumn<Student,String> emailCol = new TableColumn<>("Email address");
-        emailCol.setCellValueFactory(new PropertyValueFactory("email"));
-        table.getColumns().setAll(firstNameCol, surnameCol, idCol, addressCol, zipCol, cityCol, countryCol, emailCol);
-        
-        return table;
+        return students;
     }
 }

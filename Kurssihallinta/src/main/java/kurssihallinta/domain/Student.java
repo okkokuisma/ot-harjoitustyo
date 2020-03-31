@@ -10,6 +10,7 @@ package kurssihallinta.domain;
  * @author okkokuisma
  */
 public class Student {
+    private int dbId;
     private String firstName;
     private String surname;
     private String id;
@@ -19,7 +20,7 @@ public class Student {
     private String country;
     private String email;
 
-    public Student(String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
+    public Student(int dbId, String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
         this.firstName = firstName;
         this.surname = surname;
         this.id = id;
@@ -61,5 +62,10 @@ public class Student {
     public String getEmail() {
         return email;
     }
+
+    public int getDbId() {
+        return dbId;
+    }
+    
     
 }

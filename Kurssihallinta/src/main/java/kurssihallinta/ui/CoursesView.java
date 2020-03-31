@@ -19,8 +19,11 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -45,12 +48,20 @@ public class CoursesView {
     public Parent getParent() {
         BorderPane coursesView = new BorderPane();
         
+        // PANE FOR INDIVIDUAL COURSES
+        GridPane individualCourse = new GridPane();
+        Button returnButton = new Button("Back");
+        Button lessonButton = new Button("Add/edit lessons");
+        Label courseName = new Label();
+        
+        
+        
         // PANE FOR CONTROLS USED TO ADD NEW COURSES
         
         GridPane courseAddView = new GridPane();
         courseAddView.setVgap(10);
         courseAddView.setHgap(10);
-        courseAddView.setAlignment(Pos.TOP_CENTER);
+        courseAddView.setAlignment(Pos.CENTER);
         
         TextField nameTextfield = new TextField();
         courseAddView.addRow(0, new Label("Name:"), nameTextfield);        
@@ -60,19 +71,21 @@ public class CoursesView {
         courseAddView.addRow(2, new Label("Ending date:"), endDate);
         TextField teacherTextfield = new TextField();
         courseAddView.addRow(3, new Label("Teacher:"), teacherTextfield);
+        Spinner maxStudentsSpinner = new Spinner(0, 60, 0);
+        courseAddView.addRow(4, new Label("Maximum number of students:"), maxStudentsSpinner);
         
         Button addButton = new Button("Add to database");
         Label message = new Label();
-        courseAddView.addRow(4, addButton, message);
+        courseAddView.addRow(5, addButton, message);
         
         addButton.setOnMouseClicked((event) -> { 
             try {
-                db.addCourse(nameTextfield.getText(), startDate.getValue().format(DateTimeFormatter.ISO_DATE), endDate.getValue().format(DateTimeFormatter.ISO_DATE), teacherTextfield.getText());
+                db.addCourse(nameTextfield.getText(), startDate.getValue().format(DateTimeFormatter.ISO_DATE), endDate.getValue().format(DateTimeFormatter.ISO_DATE), teacherTextfield.getText(), (int) maxStudentsSpinner.getValue());
                 nameTextfield.clear();
                 teacherTextfield.clear();
                 message.setText("Added successfully to database");
             } catch (SQLException ex) {
-                message.setText("Error: ");
+                message.setText(ex.getMessage());
             }
         });
         
@@ -80,18 +93,30 @@ public class CoursesView {
         
         TextField searchTextfield = new TextField("Search by name");
         Button searchButton = new Button("Search");
-        searchTextfield.setAlignment(Pos.TOP_CENTER);
-        searchButton.setAlignment(Pos.TOP_CENTER);
+        Button toCoursePage = new Button("Go to selected course page");
+        
+        final TableView<Course> table = new TableView<>();
+        TableColumn<Course,String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
+        TableColumn<Course,String> startDateCol = new TableColumn<>("Start date");
+        startDateCol.setCellValueFactory(new PropertyValueFactory("startDate"));
+        TableColumn<Course,String> endDateCol = new TableColumn<>("End date");
+        endDateCol.setCellValueFactory(new PropertyValueFactory("endDate"));
+        TableColumn<Course,String> teacherCol = new TableColumn<>("Teacher");
+        teacherCol.setCellValueFactory(new PropertyValueFactory("teacher"));
+        table.getColumns().setAll(nameCol, startDateCol, endDateCol, teacherCol);
+        
         
         searchTextfield.setOnMouseClicked((event) -> {
             searchTextfield.clear(); 
         });
         
-        searchButton.setOnMouseClicked((event) -> {
-            TableView<Course> table;
+        searchTextfield.setOnKeyTyped((event) -> {          
             try {
-                table = db.searchCourses(searchTextfield.getText());
+                table.setItems(db.searchCourses(searchTextfield.getText()));
+                table.setMaxSize(400, 200);              
                 coursesView.setCenter(table);
+                coursesView.setBottom(toCoursePage);
             } catch (SQLException ex) {
                 Logger.getLogger(CoursesView.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -125,6 +150,6 @@ public class CoursesView {
         
         coursesView.setTop(navigationBar);
         
-        return coursesView;
+        return coursesView; 
     }
 }
