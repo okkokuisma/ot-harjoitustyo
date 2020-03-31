@@ -10,5 +10,5 @@ Sovelluksen avulla opiston tai koulun on mahdollista pitää kirjaa sen järjest
 
 ## Dokumentaatio
 [Vaatimusmäärittely](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/vaatimusm%C3%A4%C3%A4rittely.md)
-
+[Työaikakirjanpito](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/tuntikirjanpito.md)
 
