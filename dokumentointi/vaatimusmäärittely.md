@@ -8,9 +8,10 @@ Alkuvaiheessa sovelluksella on yksi käyttäjärooli, pääkäyttäjä, jolla on
 
 ## Perusversion tarjoama toiminnallisuus
 * Uusien kurssien lisääminen
-	* Kurssiaikataulujen luominen, vastuuopettajan lisääminen, luentojen paikan ja ajan muokkaaminen
+	* Kurssiaikataulujen luominen, vastuuopettajan lisääminen
 * Uusien opiskelijoiden lisääminen
 	* Opiskelijoiden yhteystietojen ja kurssi-ilmoittautumisten hallinnointi
+* Hakutoiminnot kursseille ja opiskelijoille
 
 ## Jatkokehitysideoita
 * Opettajille käyttäjärooli, jolla oikeudet tarkastella omien kurssien luentojen aikatauluja ja omille kursseilla ilmoittautuneita opiskelijoita
