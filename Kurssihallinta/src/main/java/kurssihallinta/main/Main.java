@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import kurssihallinta.ui.MainScene;
+import kurssihallinta.ui.KurssihallintaUi;
 
 /**
  *
@@ -23,7 +23,7 @@ import kurssihallinta.ui.MainScene;
 public class Main {
     
     public static void main(String[] args) {
-        Application.launch(MainScene.class);
+        Application.launch(KurssihallintaUi.class);
     }
 
 }

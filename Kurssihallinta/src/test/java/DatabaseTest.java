@@ -21,7 +21,7 @@ import kurssihallinta.database.TestRegistrationDao;
 import kurssihallinta.database.TestStudentDao;
 import kurssihallinta.domain.Course;
 import kurssihallinta.domain.Student;
-import kurssihallinta.ui.MainScene;
+import kurssihallinta.ui.KurssihallintaUi;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -89,7 +89,7 @@ public class DatabaseTest {
                 ps.execute();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(MainScene.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(KurssihallintaUi.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         courseDao = new TestCourseDao();

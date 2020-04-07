@@ -7,8 +7,6 @@ package kurssihallinta.domain;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.database.CourseDao;
@@ -23,7 +21,7 @@ import kurssihallinta.database.StudentDao;
 public class KurssihallintaService {
     KurssihallintaDao students;
     KurssihallintaDao courses;
-    KurssihallintaDao registrations;
+    RegistrationDao registrations;
     
     public KurssihallintaService() {
         students = new StudentDao();
@@ -47,19 +45,16 @@ public class KurssihallintaService {
         try {
             courses.add(course);
         } catch (SQLException ex) {
-            System.out.println("virhe");
             return false;
         }
         
         return true;
     }
     
-    public boolean addRegistration(String courseName) {
+    public boolean addRegistration(String courseName, String studentIdNum) {
         try {
-            registrations.add(courseName);
+            registrations.add(courseName, studentIdNum);
         } catch (SQLException ex) {
-            System.out.println("virhe");
-            System.out.println(ex.getMessage());
             return false;
         }
         

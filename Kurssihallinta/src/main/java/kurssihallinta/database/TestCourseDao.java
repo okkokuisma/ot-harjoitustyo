@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Course;
-import kurssihallinta.ui.MainScene;
+import kurssihallinta.ui.KurssihallintaUi;
 
 /**
  *

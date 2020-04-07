@@ -12,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Course;
@@ -67,7 +65,7 @@ public class RegistrationDao implements KurssihallintaDao<String, String> {
         ResultSet queryResults = s.executeQuery("SELECT id FROM Students WHERE id_number = '" + studentIdNum + "'");
         int studentId = queryResults.getInt(1);
         
-        PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE id = (SELECT course_id FROM Registrations WHERE student_id=?);");
+        PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE id IN (SELECT course_id FROM Registrations WHERE student_id=?)");
         ps.setInt(1, studentId);
         queryResults = ps.executeQuery();
 
