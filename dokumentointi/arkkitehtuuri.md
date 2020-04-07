@@ -1,2 +1,2 @@
-![Image of Yaktocat]
-(https://octodex.github.com/images/yaktocat.png)
+![Pakkauskaavio]
+(https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/pakkauskaavio.png)
