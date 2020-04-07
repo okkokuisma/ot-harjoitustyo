@@ -6,3 +6,5 @@ Sovelluksen avulla opiston tai koulun on mahdollista pitää kirjaa sen järjest
 
 [Työaikakirjanpito](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/tuntikirjanpito.md)
 
+[Arkkitehtuurikuvaus](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/arkkitehtuuri.md)
+
