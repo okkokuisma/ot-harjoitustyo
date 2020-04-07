@@ -4,14 +4,24 @@
  * and open the template in the editor.
  */
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import kurssihallinta.database.Database;
+import javafx.collections.ObservableList;
+import kurssihallinta.database.TestCourseDao;
+import kurssihallinta.database.TestRegistrationDao;
+import kurssihallinta.database.TestStudentDao;
+import kurssihallinta.domain.Course;
+import kurssihallinta.domain.Student;
+import kurssihallinta.ui.MainScene;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,8 +34,9 @@ import static org.junit.Assert.*;
  * @author ogkuisma
  */
 public class DatabaseTest {
-    Database db;
-    Connection conn;
+    TestCourseDao courseDao;
+    TestStudentDao studentDao;
+    TestRegistrationDao registrationDao;
     
     public DatabaseTest() {
     }
@@ -40,69 +51,124 @@ public class DatabaseTest {
     
     @Before
     public void setUp() {
-        db = new Database();
+        
+        try {
+            Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+            Statement s = db.createStatement();
+
+            s.execute("CREATE TABLE Courses (id INTEGER PRIMARY KEY, name TEXT UNIQUE, startdate TEXT, enddate TEXT, teacher TEXT, students INTEGER, max_students INTEGER)");
+            s.execute("CREATE TABLE Students (id INTEGER PRIMARY KEY, first_name TEXT, surname TEXT, id_number TEXT UNIQUE, address TEXT, zip TEXT, city TEXT, country TEXT, email TEXT)");
+            s.execute("CREATE TABLE Classrooms (id INTEGER PRIMARY KEY, name TEXT UNIQUE)");
+            s.execute("CREATE TABLE Registrations (id INTEGER PRIMARY KEY, course_id INTEGER, student_id INTEGER)");
+            s.execute("CREATE TABLE Lessons (id INTEGER PRIMARY KEY, course_id INTEGER, classroom_id INTEGER, date TEXT, starttime TEXT, endtime TEXT)");
+            
+            // ADD 10 STUDENTS
+            PreparedStatement ps = db.prepareStatement("INSERT INTO Students (first_name,surname,id_number,address,zip,city,country,email) VALUES (?,?,?,?,?,?,?,?)");
+            for (int i = 0; i < 10; i++) {
+                ps.setString(1, "firstname" + i);
+                ps.setString(2, "surname" + i);
+                ps.setString(3, "i_d" + i);
+                ps.setString(4, "address" + i);
+                ps.setString(5, "city" + i);
+                ps.setString(6, "zip" + i);
+                ps.setString(7, "country" + i);
+                ps.setString(8, "email" + i);
+                ps.execute();
+            }
+            
+            // ADD 10 COURSES
+            ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher,students,max_students) VALUES (?,?,?,?,?,?)");
+            LocalDate date = LocalDate.now();
+            for (int i = 0; i < 10; i++) {
+                ps.setString(1, "course" + i);
+                ps.setString(2, date.toString());
+                ps.setString(3, date.toString());
+                ps.setString(4, "teacher" + i);
+                ps.setInt(5, i);
+                ps.setInt(6, i);
+                ps.execute();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MainScene.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        courseDao = new TestCourseDao();
+        studentDao = new TestStudentDao();
+        registrationDao = new TestRegistrationDao();
     }
     
     @After
     public void tearDown() {
+        File file = new File("test.db");
+        System.out.println(file.delete());
+    }
+    
+
+    @Test
+    public void courseDaoAdd() throws SQLException {
+        
+        for (int i = 0; i < 10; i++) {
+            LocalDate date = LocalDate.now();
+            Course course = new Course("name" + i, date, date, "teacher" + i, i);
+            courseDao.add(course);
+        }
+        
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        Statement s = db.createStatement();
+        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Courses");
+        int courses = rs.getInt(1);
+        db.close();
+        
+        assertEquals(20, courses);
+    }
+    
+    @Test
+    public void courseDaoSearch() throws SQLException {
+        ObservableList courses = courseDao.search("xxx");
+        assertEquals(0, courses.size());      
+        
+        courses = courseDao.search("course");
+        assertEquals(10, courses.size());
+    }
+
+    @Test
+    public void studentDaoAdd() throws SQLException {
+        for (int i = 0; i < 10; i++) {
+            Student student = new Student("firstName" + i,"surname" + i,"id" + i,"address" + i,"city" + i,"zipcode" + i,"country" + i,"email" + i);
+            studentDao.add(student);
+        }
+        
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        Statement s = db.createStatement();
+        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Students");
+        int courses = rs.getInt(1);
+        db.close();
+        
+        assertEquals(20, courses);
+    }
+    
+    @Test
+    public void studentDaoSearch() throws SQLException {
+        ObservableList students = studentDao.search("xxx");
+        assertEquals(0, students.size());
+        
+        students = studentDao.search("name");
+        assertEquals(10, students.size());
     }
     
 //    @Test
-//    public void addCourseAddsCourses() {
-//        int coursesBefore = 0;
-//        try {
-//            conn  = DriverManager.getConnection("jdbc:sqlite:database.db");
-//            Statement s = conn.createStatement();
-//            ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Courses");
-//            coursesBefore = rs.getInt(1);
-//            conn.close();
-//        } catch (SQLException ex) {
-//            Logger.getLogger(NewEmptyJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
-//        db.connect();
-//        
-//        String courseName = "course";
-//        String date = "date";
-//        String teacher = "teacher";
-//        int maxNumber = 0;
+//    public void registrationDaoAdd() throws SQLException {
 //        
 //        for (int i = 0; i < 10; i++) {
-//            courseName = courseName + i;
-//            date = date + i;
-//            teacher = teacher + i;
-//            maxNumber += i;
-//            try {
-//                db.addCourse(courseName, date, date, teacher, maxNumber);
-//            } catch (SQLException ex) {
-//                Logger.getLogger(NewEmptyJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-//            }
+//            registrationDao.add("course" + i);
 //        }
 //        
-//        int coursesAfter = 0;
-//        try {
-//            conn  = DriverManager.getConnection("jdbc:sqlite:database.db");
-//            Statement s = conn.createStatement();
-//            ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Courses");
-//            coursesAfter = rs.getInt(1);
-//            conn.close();
-//        } catch (SQLException ex) {
-//            Logger.getLogger(NewEmptyJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+//        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+//        Statement s = db.createStatement();
+//        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Courses");
+//        int courses = rs.getInt(1);
+//        db.close();
 //        
-//        assertEquals(10, coursesAfter - coursesBefore);
+//        assertEquals(10, courses);
 //    }
-
-    @Test
-    public void rightNumberTablesAfterConnecting() {
-        db.connect();
-        try {
-            conn  = DriverManager.getConnection("jdbc:sqlite:database.db");
-            Statement s = conn.createStatement();
-            ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type='table'");
-            assertEquals(5, rs.getInt(1));
-        } catch (SQLException ex) {
-            Logger.getLogger(DatabaseTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

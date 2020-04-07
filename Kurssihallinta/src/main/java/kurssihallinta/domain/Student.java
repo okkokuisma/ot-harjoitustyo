@@ -20,7 +20,7 @@ public class Student {
     private String country;
     private String email;
 
-    public Student(int dbId, String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
+    public Student(String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
         this.firstName = firstName;
         this.surname = surname;
         this.id = id;

@@ -5,23 +5,18 @@
  */
 package kurssihallinta.ui;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
-import kurssihallinta.database.Database;
 import kurssihallinta.domain.Course;
+import kurssihallinta.domain.KurssihallintaService;
 import kurssihallinta.domain.Student;
 
 /**
@@ -29,52 +24,20 @@ import kurssihallinta.domain.Student;
  * @author okkokuisma
  */
 public class StudentsView {
-    final TableView<Student> tableStudents;
-    final TableView<Course> tableCourses;
+    private TableViewController tableControl;
+    private TableView table;
     Course selectedCourse;
     private boolean searchView;
-    Database db;
+    KurssihallintaService service;
     
-    public StudentsView(Database db) {
+    public StudentsView() {
+        service = new KurssihallintaService();
         searchView = true;
-        this.db = db;
-        
-        // INITIALIZE STUDENT TABLE
-        tableStudents = new TableView<>();
-        TableColumn<Student,String> firstNameCol = new TableColumn<>("First name");
-        firstNameCol.setCellValueFactory(new PropertyValueFactory("firstName"));
-        TableColumn<Student,String> surnameCol = new TableColumn<>("Surname");
-        surnameCol.setCellValueFactory(new PropertyValueFactory("surname"));
-        TableColumn<Student,String> idCol = new TableColumn<>("Personal ID");
-        idCol.setCellValueFactory(new PropertyValueFactory("id"));
-        TableColumn<Student,String> addressCol = new TableColumn<>("Home address");
-        addressCol.setCellValueFactory(new PropertyValueFactory("address"));
-        TableColumn<Student,String> zipCol = new TableColumn<>("ZIP code");
-        zipCol.setCellValueFactory(new PropertyValueFactory("zipCode"));
-        TableColumn<Student,String> cityCol = new TableColumn<>("City");
-        cityCol.setCellValueFactory(new PropertyValueFactory("city"));
-        TableColumn<Student,String> countryCol = new TableColumn<>("Country");
-        countryCol.setCellValueFactory(new PropertyValueFactory("country"));
-        TableColumn<Student,String> emailCol = new TableColumn<>("Email address");
-        emailCol.setCellValueFactory(new PropertyValueFactory("email"));
-        
-        //INITIALIZE COURSE TABLE
-        tableStudents.getColumns().setAll(firstNameCol, surnameCol, idCol, addressCol, zipCol, cityCol, countryCol, emailCol);
-        tableCourses = new TableView<>();
-        TableColumn<Course,String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory("name"));
-        TableColumn<Course,String> startDateCol = new TableColumn<>("Start date");
-        startDateCol.setCellValueFactory(new PropertyValueFactory("startDate"));
-        TableColumn<Course,String> endDateCol = new TableColumn<>("End date");
-        endDateCol.setCellValueFactory(new PropertyValueFactory("endDate"));
-        TableColumn<Course,String> teacherCol = new TableColumn<>("Teacher");
-        teacherCol.setCellValueFactory(new PropertyValueFactory("teacher"));
-        tableCourses.getColumns().setAll(nameCol, startDateCol, endDateCol, teacherCol);     
+        tableControl = new TableViewController();
     }
     
     public Parent getParent() {
-        BorderPane studentsView = new BorderPane();
-        
+        BorderPane studentsView = new BorderPane();      
         
         // PANE FOR ADDING NEW STUDENT INFO
         GridPane studentAddView = new GridPane();
@@ -108,21 +71,23 @@ public class StudentsView {
             if (firstNameTextfield.getText().isBlank() | surnameTextfield.getText().isBlank() | idTextfield.getText().isBlank()) {
                 message.setText("Fill required info");
             } else {
-                try {
-                    db.addStudent(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
-                    db.addRegistration(selectedCourse.getDbId());
-                    firstNameTextfield.clear();
-                    surnameTextfield.clear();
-                    idTextfield.clear();
-                    addressTextfield.clear();
-                    zipTextfield.clear();
-                    cityTextfield.clear();
-                    countryTextfield.clear();
-                    emailTextfield.clear();
+                service.addStudent(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
+                
+                if (selectedCourse != null) {
+                    service.addRegistration(selectedCourse.getName());
+                    selectedCourse = null;
                     message.setText("Added successfully to database");
-                } catch (SQLException ex) {
-                    message.setText("Error: ");
+                } else {
+                    message.setText("No course selected");
                 }
+                firstNameTextfield.clear();
+                surnameTextfield.clear();
+                idTextfield.clear();
+                addressTextfield.clear();
+                zipTextfield.clear();
+                cityTextfield.clear();
+                countryTextfield.clear();
+                emailTextfield.clear();
             }
         });
         
@@ -135,21 +100,11 @@ public class StudentsView {
         
         searchTextfield.setOnKeyTyped((event) -> {
             if (searchView) {
-                try {
-                    tableStudents.setItems(db.searchStudents(searchTextfield.getText()));
-                    tableStudents.setMaxSize(800, 300);
-                    studentsView.setCenter(tableStudents);
-                } catch (SQLException ex) {
-                    Logger.getLogger(StudentsView.class.getName()).log(Level.SEVERE, null, ex);
-                }         
+                table = tableControl.getStudentTable(service.searchStudents(searchTextfield.getText()));
+                studentsView.setCenter(table);         
             } else {
-                try {
-                    tableCourses.setItems(db.searchCourses(searchTextfield.getText()));
-                    tableCourses.setMaxSize(400, 200);
-                    studentsView.setCenter(tableCourses);
-                } catch (SQLException ex) {
-                    Logger.getLogger(StudentsView.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                table = tableControl.getCourseTable(service.searchCourses(searchTextfield.getText()));
+                studentsView.setCenter(table); 
             }
             
         });
@@ -181,12 +136,43 @@ public class StudentsView {
         });
         
         selectButton.setOnMouseClicked((event) -> {
-            selectedCourse = tableCourses.getSelectionModel().getSelectedItem();
+            searchView = true;
+            selectedCourse = (Course) table.getSelectionModel().getSelectedItem();
             studentsView.setCenter(studentAddView);
         });
         
         studentsView.setTop(navigationBar);
         
+        HBox bottomNavigationBar = new HBox();
+        bottomNavigationBar.setPadding(new Insets(0, 15, 30, 15));
+        Button studentViewButton = new Button("Go to student page");
+        bottomNavigationBar.getChildren().add(studentViewButton);
+        
+        studentViewButton.setOnMouseClicked((event) -> {
+            Student student = (Student) table.getSelectionModel().getSelectedItem();
+            studentsView.setCenter(getIndividualStudentView(student));
+        });
+        
+        studentsView.setBottom(bottomNavigationBar);
+        
         return studentsView;
+    }
+    
+    public Parent getIndividualStudentView(Student student) {
+
+        BorderPane basis = new BorderPane();
+        
+        GridPane studentInfo = new GridPane();
+        
+        studentInfo.addRow(0, new Label("Name:\t" + student.getFirstName() + " " + student.getSurname()), new Label("Address:\t" + student.getAddress()));
+        studentInfo.addRow(1, new Label("Personal ID:\t" + student.getId()), new Label("City and ZIP code:\t" + student.getCity() + " " + student.getZipCode()));
+        studentInfo.addRow(2, new Label("Email address:\t" + student.getEmail()), new Label("Country:\t" + student.getCountry()));
+        studentInfo.setPadding(new Insets(50, 100, 10, 30));
+        studentInfo.setHgap(100);
+        
+        basis.setTop(studentInfo);
+        basis.setCenter(tableControl.getCourseTable(service.searchRegistrations(student.getId())));
+        
+        return basis;
     }
 }

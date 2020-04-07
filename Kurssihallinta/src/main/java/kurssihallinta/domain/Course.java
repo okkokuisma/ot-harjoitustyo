@@ -27,7 +27,7 @@ public class Course {
     public Course() {       
     }
 
-    public Course(int dbId, String name, LocalDate startDate, LocalDate endDate, String teacher, int maxStudents) {
+    public Course(String name, LocalDate startDate, LocalDate endDate, String teacher, int maxStudents) {
         this.dbId = dbId;
         this.name = name;
         this.startDate = startDate;
