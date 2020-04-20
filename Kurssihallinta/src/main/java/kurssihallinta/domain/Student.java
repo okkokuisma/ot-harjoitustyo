@@ -10,7 +10,6 @@ package kurssihallinta.domain;
  * @author okkokuisma
  */
 public class Student {
-    private int dbId;
     private String firstName;
     private String surname;
     private String id;
@@ -63,9 +62,32 @@ public class Student {
         return email;
     }
 
-    public int getDbId() {
-        return dbId;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
-    
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
     
 }

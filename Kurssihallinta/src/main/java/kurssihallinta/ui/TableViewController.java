@@ -45,7 +45,7 @@ public class TableViewController {
     }
     
     public TableView getCourseTable(ObservableList courses) {
-        table = new TableView<>();       
+        table = new TableView<Course>();       
         TableColumn<Course, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         TableColumn<Course, String> startDateCol = new TableColumn<>("Start date");

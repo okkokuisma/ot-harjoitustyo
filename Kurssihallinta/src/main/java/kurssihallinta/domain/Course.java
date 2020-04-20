@@ -7,17 +7,13 @@ package kurssihallinta.domain;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 /**
  *
  * @author okkokuisma
  */
 public class Course {
-    private int dbId;
     private String name;
-//    private StringProperty nameSP;
     private LocalDate startDate;
     private LocalDate endDate;
     private String teacher;
@@ -27,21 +23,14 @@ public class Course {
     public Course() {       
     }
 
-    public Course(String name, LocalDate startDate, LocalDate endDate, String teacher, int maxStudents) {
-        this.dbId = dbId;
+    public Course(String name, LocalDate startDate, LocalDate endDate, String teacher, int students, int maxStudents) {
+        this.students = students;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.teacher = teacher;
-        this.students = 0;
         this.maxStudents = maxStudents;
-//        nameSP = new SimpleStringProperty(this, "name");
-//        nameSP.set(name);
     }
-    
-//    public StringProperty nameProperty() {
-//        return nameSP;
-//    }
 
     public String getName() {
         return name;
@@ -74,10 +63,6 @@ public class Course {
     public void setTeacher(String teacher) {
         this.teacher = teacher;
     }
-    
-    public int getDbId() {
-        return dbId;
-    }
 
     public int getStudents() {
         return students;
@@ -85,6 +70,14 @@ public class Course {
 
     public int getMaxStudents() {
         return maxStudents;
+    }
+
+    public void setStudents(int students) {
+        this.students = students;
+    }
+
+    public void setMaxStudents(int maxStudents) {
+        this.maxStudents = maxStudents;
     }
     
     

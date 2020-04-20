@@ -35,6 +35,31 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
         ps.execute();
         db.close();
     }
+    
+    @Override
+    public void update(Student student) throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        PreparedStatement ps = db.prepareStatement("UPDATE Students SET "
+                + "first_name = ?, "
+                + "surname = ?, "
+                + "address = ?, "
+                + "zip = ?, "
+                + "city = ?, "
+                + "country = ?, "
+                + "email = ? " 
+                + "WHERE id_number = ?");
+        ps.setString(1, student.getFirstName());
+        ps.setString(2, student.getSurname());
+        ps.setString(3, student.getAddress());
+        ps.setString(4, student.getZipCode());
+        ps.setString(5, student.getCity());
+        ps.setString(6, student.getCountry());
+        ps.setString(7, student.getEmail());
+        ps.setString(8, student.getId());
+        ps.execute();
+        
+        db.close();
+    }
 
     @Override
     public ObservableList search(String key) throws SQLException {

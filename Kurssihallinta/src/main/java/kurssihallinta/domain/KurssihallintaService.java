@@ -7,6 +7,8 @@ package kurssihallinta.domain;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.database.CourseDao;
@@ -40,8 +42,7 @@ public class KurssihallintaService {
         return true;
     }
     
-    public boolean addCourse(String courseName, LocalDate startDate, LocalDate endDate, String teacher, int maxStudents) {
-        Course course = new Course(courseName, startDate, endDate, teacher, maxStudents);
+    public boolean addCourse(Course course) {
         try {
             courses.add(course);
         } catch (SQLException ex) {
@@ -81,16 +82,43 @@ public class KurssihallintaService {
         return studentList;
     }
     
-    public ObservableList searchRegistrations(String searchWord) {
-        ObservableList<Student> courseList = FXCollections.observableArrayList();
+    public ObservableList searchRegistrationsByStudentId(String searchWord) {
+        ObservableList<Course> courseList = FXCollections.observableArrayList();
         try {
-            courseList = registrations.search(searchWord);
+            courseList = registrations.searchRegistrationsByStudents(searchWord);
         } catch (SQLException ex) { 
-            System.out.println("virhe");
-            System.out.println(ex.getMessage());
-            ex.printStackTrace();
         }
         
         return courseList;
+    }
+    
+    public ObservableList searchRegistrationsByCourseName(String searchWord) {
+        ObservableList<Student> studentList = FXCollections.observableArrayList();
+        try {
+            studentList = registrations.searchRegistrationsByCourses(searchWord);
+        } catch (SQLException ex) { 
+        }
+        
+        return studentList;
+    }
+    
+    public boolean updateCourse(Course course) {
+        try {
+            courses.update(course);
+        } catch (SQLException ex) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public boolean updateStudent(Student student) {
+        try {
+            students.update(student);
+        } catch (SQLException ex) {
+            return false;
+        }
+        
+        return true;
     }
 }

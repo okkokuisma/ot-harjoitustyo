@@ -35,6 +35,25 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
         
         db.close();
     }
+    
+    @Override
+    public void update(Course course) throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+        PreparedStatement ps = db.prepareStatement("UPDATE Courses SET "
+                + "startdate = ?, "
+                + "enddate = ?, "
+                + "teacher = ?, "
+                + "max_students = ? "
+                + "WHERE name = ?");
+        ps.setString(1, course.getStartDate());
+        ps.setString(2, course.getEndDate());
+        ps.setString(3, course.getTeacher());
+        ps.setInt(4, course.getMaxStudents());
+        ps.setString(5, course.getName());
+        ps.execute();
+        
+        db.close();
+    }
 
     @Override
     public ObservableList search(String key) throws SQLException {
@@ -48,7 +67,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
         while (queryResults.next()) {
             LocalDate startDate = LocalDate.parse(queryResults.getString(3));
             LocalDate endDate = LocalDate.parse(queryResults.getString(4));
-            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(7));
+            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(6), queryResults.getInt(7));
             courses.add(course);
         }
         

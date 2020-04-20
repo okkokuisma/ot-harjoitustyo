@@ -16,5 +16,6 @@ import javafx.collections.ObservableList;
  */
 public interface KurssihallintaDao<T, K> {
     void add(T object) throws SQLException;
+    void update(T object) throws SQLException;
     ObservableList search(K key) throws SQLException;
 }

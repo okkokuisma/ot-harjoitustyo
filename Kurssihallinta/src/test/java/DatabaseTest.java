@@ -105,11 +105,10 @@ public class DatabaseTest {
     
 
     @Test
-    public void courseDaoAdd() throws SQLException {
-        
+    public void courseDaoAdd() throws SQLException {     
         for (int i = 0; i < 10; i++) {
             LocalDate date = LocalDate.now();
-            Course course = new Course("name" + i, date, date, "teacher" + i, i);
+            Course course = new Course("name" + i, date, date, "teacher" + i, i, i);
             courseDao.add(course);
         }
         

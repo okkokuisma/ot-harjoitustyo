@@ -15,17 +15,14 @@ import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Course;
+import kurssihallinta.domain.Student;
 
 /**
  *
  * @author okkokuisma
  */
-public class RegistrationDao implements KurssihallintaDao<String, String> {
+public class RegistrationDao {
 
-    public RegistrationDao() {
-    }
-
-    @Override
     public void add(String courseName) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement s = db.createStatement();
@@ -38,6 +35,8 @@ public class RegistrationDao implements KurssihallintaDao<String, String> {
         ps.setInt(1, courseId);
         ps.setInt(2, studentId);
         ps.execute();
+        
+        s.execute("UPDATE Courses SET students = students + 1 WHERE id = " + courseId);
         
         db.close();
     }
@@ -55,11 +54,12 @@ public class RegistrationDao implements KurssihallintaDao<String, String> {
         ps.setInt(2, studentId);
         ps.execute();
         
+        s.execute("UPDATE Courses SET students = students + 1 WHERE id = " + courseId);
+        
         db.close();
     }
 
-    @Override
-    public ObservableList search(String studentIdNum) throws SQLException {
+    public ObservableList searchRegistrationsByStudents(String studentIdNum) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement s = db.createStatement();
         ResultSet queryResults = s.executeQuery("SELECT id FROM Students WHERE id_number = '" + studentIdNum + "'");
@@ -74,7 +74,7 @@ public class RegistrationDao implements KurssihallintaDao<String, String> {
         while (queryResults.next()) {
             LocalDate startDate = LocalDate.parse(queryResults.getString(3));
             LocalDate endDate = LocalDate.parse(queryResults.getString(4));
-            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(7));
+            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(6), queryResults.getInt(7));
             courses.add(course);
         }
         
@@ -82,4 +82,24 @@ public class RegistrationDao implements KurssihallintaDao<String, String> {
         return courses;
     }
     
+        public ObservableList searchRegistrationsByCourses(String courseName) throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+        Statement s = db.createStatement();
+        ResultSet queryResults = s.executeQuery("SELECT id FROM Courses WHERE name = '" + courseName + "'");
+        int courseId = queryResults.getInt(1);
+        
+        PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE id IN (SELECT student_id FROM Registrations WHERE course_id=?)");
+        ps.setInt(1, courseId);
+        queryResults = ps.executeQuery();
+
+        // CREATE A LIST OBJECT FROM QUERY RESULTS
+        ObservableList<Student> students = FXCollections.observableArrayList();
+        while (queryResults.next()) {
+            Student student = new Student(queryResults.getString(2), queryResults.getString(3), queryResults.getString(4), queryResults.getString(5), queryResults.getString(6), queryResults.getString(7), queryResults.getString(8), queryResults.getString(9));
+            students.add(student);
+        }
+        
+        db.close();
+        return students;
+    }
 }

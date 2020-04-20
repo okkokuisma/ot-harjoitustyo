@@ -20,9 +20,8 @@ import kurssihallinta.domain.Course;
  *
  * @author okkokuisma
  */
-public class TestRegistrationDao implements KurssihallintaDao<String, String> {
+public class TestRegistrationDao {
 
-    @Override
     public void add(String courseName) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
         Statement s = db.createStatement();
@@ -53,7 +52,6 @@ public class TestRegistrationDao implements KurssihallintaDao<String, String> {
         db.close();
     }
 
-    @Override
     public ObservableList search(String studentIdNum) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
         Statement s = db.createStatement();
@@ -69,7 +67,7 @@ public class TestRegistrationDao implements KurssihallintaDao<String, String> {
         while (queryResults.next()) {
             LocalDate startDate = LocalDate.parse(queryResults.getString(3));
             LocalDate endDate = LocalDate.parse(queryResults.getString(4));
-            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(7));
+            Course course = new Course(queryResults.getString(2), startDate, endDate, queryResults.getString(5), queryResults.getInt(6), queryResults.getInt(7));
             courses.add(course);
         }
 
