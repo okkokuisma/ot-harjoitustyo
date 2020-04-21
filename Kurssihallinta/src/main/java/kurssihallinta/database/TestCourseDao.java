@@ -62,7 +62,9 @@ public class TestCourseDao implements KurssihallintaDao<Course, String> {
     @Override
     public ObservableList search(String key) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
-        PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE name LIKE '%" + key + "%'");
+        String searchWord = "%" + key + "%";
+        PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE name LIKE ?");
+        ps.setString(1, searchWord);
 
         ResultSet queryResults = ps.executeQuery();
         

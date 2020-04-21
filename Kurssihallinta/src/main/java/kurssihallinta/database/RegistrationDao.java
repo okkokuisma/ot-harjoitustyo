@@ -22,38 +22,24 @@ import kurssihallinta.domain.Student;
  * @author okkokuisma
  */
 public class RegistrationDao {
-
-    public void add(String courseName) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-        Statement s = db.createStatement();
-        ResultSet queryResults = s.executeQuery("SELECT id FROM Students ORDER BY id DESC LIMIT 1");
-        int studentId = queryResults.getInt(1);
-        queryResults = s.executeQuery("SELECT id FROM Courses WHERE name = '" + courseName + "'");
-        int courseId = queryResults.getInt(1);
-        
-        PreparedStatement ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
-        ps.setInt(1, courseId);
-        ps.setInt(2, studentId);
-        ps.execute();
-        
-        s.execute("UPDATE Courses SET students = students + 1 WHERE id = " + courseId);
-        
-        db.close();
-    }
     
     public void add(String courseName, String studentIdNum) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-        Statement s = db.createStatement();
-        ResultSet queryResults = s.executeQuery("SELECT id FROM Students WHERE id_number = '" + studentIdNum + "'");
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Students WHERE id_number = ?");
+        ps.setString(1, studentIdNum);
+        ResultSet queryResults = ps.executeQuery();
         int studentId = queryResults.getInt(1);
-        queryResults = s.executeQuery("SELECT id FROM Courses WHERE name = '" + courseName + "'");
+        ps = db.prepareStatement("SELECT id FROM Courses WHERE name = ?");
+        ps.setString(1, courseName);
+        queryResults = ps.executeQuery();
         int courseId = queryResults.getInt(1);
         
-        PreparedStatement ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
+        ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
         ps.setInt(1, courseId);
         ps.setInt(2, studentId);
         ps.execute();
         
+        Statement s = db.createStatement();
         s.execute("UPDATE Courses SET students = students + 1 WHERE id = " + courseId);
         
         db.close();
@@ -61,11 +47,15 @@ public class RegistrationDao {
 
     public ObservableList searchRegistrationsByStudents(String studentIdNum) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-        Statement s = db.createStatement();
-        ResultSet queryResults = s.executeQuery("SELECT id FROM Students WHERE id_number = '" + studentIdNum + "'");
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Students WHERE id_number = ?");
+        ps.setString(1, studentIdNum);
+        ResultSet queryResults = ps.executeQuery();
+        if (!queryResults.next()) {
+            return null;
+        }   
         int studentId = queryResults.getInt(1);
         
-        PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE id IN (SELECT course_id FROM Registrations WHERE student_id=?)");
+        ps = db.prepareStatement("SELECT * FROM Courses WHERE id IN (SELECT course_id FROM Registrations WHERE student_id=?)");
         ps.setInt(1, studentId);
         queryResults = ps.executeQuery();
 
@@ -82,13 +72,17 @@ public class RegistrationDao {
         return courses;
     }
     
-        public ObservableList searchRegistrationsByCourses(String courseName) throws SQLException {
+    public ObservableList searchRegistrationsByCourses(String courseName) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-        Statement s = db.createStatement();
-        ResultSet queryResults = s.executeQuery("SELECT id FROM Courses WHERE name = '" + courseName + "'");
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Courses WHERE name = ?");
+        ps.setString(1, courseName);
+        ResultSet queryResults = ps.executeQuery();
+        if (!queryResults.next()) {
+            return null;
+        }
         int courseId = queryResults.getInt(1);
         
-        PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE id IN (SELECT student_id FROM Registrations WHERE course_id=?)");
+        ps = db.prepareStatement("SELECT * FROM Students WHERE id IN (SELECT student_id FROM Registrations WHERE course_id=?)");
         ps.setInt(1, courseId);
         queryResults = ps.executeQuery();
 

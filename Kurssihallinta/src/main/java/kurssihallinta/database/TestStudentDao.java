@@ -26,7 +26,7 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
         PreparedStatement ps = db.prepareStatement("INSERT INTO Students (first_name,surname,id_number,address,zip,city,country,email) VALUES (?,?,?,?,?,?,?,?)");
         ps.setString(1, student.getFirstName());
         ps.setString(2, student.getSurname());
-        ps.setString(3, student.getSurname());
+        ps.setString(3, student.getId());
         ps.setString(4, student.getAddress());
         ps.setString(5, student.getZipCode());
         ps.setString(6, student.getCity());
@@ -46,8 +46,7 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
                 + "zip = ?, "
                 + "city = ?, "
                 + "country = ?, "
-                + "email = ? " 
-                + "WHERE id_number = ?");
+                + "email = ? WHERE id_number = ?");
         ps.setString(1, student.getFirstName());
         ps.setString(2, student.getSurname());
         ps.setString(3, student.getAddress());
@@ -56,15 +55,17 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
         ps.setString(6, student.getCountry());
         ps.setString(7, student.getEmail());
         ps.setString(8, student.getId());
-        ps.execute();
-        
+        ps.execute();     
         db.close();
     }
 
     @Override
     public ObservableList search(String key) throws SQLException {
         Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
-        PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE first_name LIKE '%" + key + "%' OR surname LIKE '%" + key + "%'");
+        String searchWord = "%" + key + "%";
+        PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE first_name LIKE ? OR surname LIKE ?");
+        ps.setString(1, searchWord);
+        ps.setString(2, searchWord);
 
         ResultSet queryResults = ps.executeQuery();
         
@@ -75,6 +76,7 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
             students.add(student);
         }
         
-        return students;
+        db.close();
+        return students;    
     }
 }

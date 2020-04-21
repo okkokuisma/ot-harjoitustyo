@@ -5,8 +5,6 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress files="kurssihallinta.ui.CoursesView.java" checks="[a-zA-Z0-9]*"/>
-    <suppress files="kurssihallinta.ui.StudentsView.java" checks="[a-zA-Z0-9]*"/>
-    <suppress files="kurssihallinta.ui.MainScene.java" checks="[a-zA-Z0-9]*"/>
+    <suppress files="kurssihallinta.ui.KurssihallintaUi.java" checks="[a-zA-Z0-9]*"/>
     <suppress files="kurssihallinta.ui.TableViewController.java" checks="[a-zA-Z0-9]*"/>
 </suppressions>
