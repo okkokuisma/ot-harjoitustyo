@@ -2,6 +2,7 @@
 
 ## Rakenne
 Sovelluksen rakenne on toteutettu kolmistasoista kerrosarkkitehtuuria noudattaen. Pakkaus kurssihallinta.ui sisältää sovelluksen JavaFX:llä toteutetun graafisen käyttöliittymän, kurssihallinta.domain sisältää sovelluksen sovelluslogiikan ja kurssihallinta.dao sisältää koodin, joka vastaa datan pysyväistallennuksesta.
+
 ![Pakkausrakenne](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/pakkausrakenne.png)
 
 ## Käyttöliittymä
@@ -20,6 +21,7 @@ KurssihallintaService saa oliomuuttujina kurssihallinta.dao-pakkauksen luokat Co
 ## Tietojen pysyväistallennus
 Tietojen pysyväistallennus on pyritty toteuttaa Data Access Object -mallia noudattaen. Sovellus tarvitsee toimiakseen tietokantatiedoston, jonka se luo automaattisesti käynnistettäessä ensimmäisen kerran sovelluksen juurikansioon. 
 
-# Tietokanta
+### Tietokanta
 Sovellus käyttää tietokantajärjestelmänä SQLiteä.
+
 ![Sekvenssikaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/sekvenssikaavio_kurssilisays.png)
