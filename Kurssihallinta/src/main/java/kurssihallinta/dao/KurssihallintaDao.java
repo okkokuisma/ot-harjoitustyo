@@ -1,4 +1,4 @@
-package kurssihallinta.database;
+package kurssihallinta.dao;
 
 
 import java.sql.SQLException;
@@ -18,4 +18,7 @@ public interface KurssihallintaDao<T, K> {
     void add(T object) throws SQLException;
     void update(T object) throws SQLException;
     ObservableList search(K key) throws SQLException;
+    int getId(String key) throws SQLException;
+    T get(int key) throws SQLException;
+    ObservableList getAll() throws SQLException;
 }

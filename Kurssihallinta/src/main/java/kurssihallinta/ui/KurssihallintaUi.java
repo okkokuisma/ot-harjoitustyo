@@ -20,8 +20,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
@@ -32,10 +34,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import kurssihallinta.domain.Classroom;
 import kurssihallinta.domain.Course;
 import kurssihallinta.domain.KurssihallintaService;
+import kurssihallinta.domain.Lesson;
 import kurssihallinta.domain.Student;
+import tornadofx.control.DateTimePicker;
 
 
 /**
@@ -46,8 +52,11 @@ public class KurssihallintaUi extends Application {
     private KurssihallintaService service;
     private Scene courseScene;
     private Scene regScene;
+    private Scene lessonsScene;
     private TableView table;
     private TableViewController tableControl;
+    private Student selectedStudent;
+    private Course selectedCourse;
 
     
     @Override
@@ -61,6 +70,7 @@ public class KurssihallintaUi extends Application {
             Statement s = db.createStatement();
             ResultSet queryResult = s.executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type='table'");
             if (queryResult.getInt(1) > 0) {
+                db.close();
                 return;
             }
 
@@ -75,32 +85,50 @@ public class KurssihallintaUi extends Application {
     }
 
     @Override
-    public void start(Stage stage) {   
+    public void start(Stage stage) { 
+        
+        // Root panes
+        BorderPane courseSceneCorePane = new BorderPane();
+        BorderPane regSceneCorePane = new BorderPane();
+        BorderPane lessonsSceneCorePane = new BorderPane();
+        
  
         // COURSE SCENE
-        BorderPane courseSceneCorePane = new BorderPane();
         courseSceneCorePane.setPadding(new Insets(10, 10, 10, 10));
         BorderPane courseSceneInnerPane = new BorderPane();
         courseSceneInnerPane.setPadding(new Insets(0, 40, 20, 40));
         
         // Upper navigation panel for navigating between scenes
-        HBox courseNavigationPanel = new HBox();
-        courseNavigationPanel.setSpacing(10);
+        HBox navigationPanel = new HBox();
+        navigationPanel.setSpacing(10);
 
         Button coursesButton = new Button("Courses");
         Button regButton = new Button("Registrations");
+        Button lessonsButton = new Button("Lessons");
 
-        courseNavigationPanel.getChildren().addAll(coursesButton, regButton);
-        
+        navigationPanel.getChildren().addAll(coursesButton, regButton, lessonsButton);
         coursesButton.setOnMouseClicked((event) -> {
+            Pane root = (Pane) stage.getScene().getRoot();
+            root.getChildren().remove(navigationPanel);
+            courseSceneCorePane.setTop(navigationPanel);
             stage.setScene(courseScene);
         });
         
         regButton.setOnMouseClicked((event) -> {
+            Pane root = (Pane) stage.getScene().getRoot();
+            root.getChildren().remove(navigationPanel);
+            regSceneCorePane.setTop(navigationPanel);
             stage.setScene(regScene);
         });
         
-        courseSceneCorePane.setTop(courseNavigationPanel);
+        lessonsButton.setOnMouseClicked((event) -> {
+            Pane root = (Pane) stage.getScene().getRoot();
+            root.getChildren().remove(navigationPanel);
+            lessonsSceneCorePane.setTop(navigationPanel);
+            stage.setScene(lessonsScene);
+        });
+        
+        courseSceneCorePane.setTop(navigationPanel);
         courseSceneCorePane.setCenter(courseSceneInnerPane);
         
         // Controls for individual course view
@@ -179,31 +207,12 @@ public class KurssihallintaUi extends Application {
         courseScene = new Scene(courseSceneCorePane, 900, 700);
         
         // REGISTRATION SCENE
-        BorderPane regSceneCorePane = new BorderPane();
         BorderPane regSceneInnerPane = new BorderPane();
-        
-        // Upper navigation panel for navigating between scenes
-        HBox regNavigationPanel = new HBox();
-        regNavigationPanel.setSpacing(10);
 
-        Button courses = new Button("Courses");
-        Button reg = new Button("Registrations");
-
-        regNavigationPanel.getChildren().addAll(courses, reg);
-        
-        courses.setOnMouseClicked((event) -> {
-            stage.setScene(courseScene);
-        });
-        
-        reg.setOnMouseClicked((event) -> {
-            stage.setScene(regScene);
-        });
-        
-        regSceneCorePane.setTop(regNavigationPanel);
         regSceneCorePane.setPadding(new Insets(10, 10, 10, 10));
         regSceneCorePane.setCenter(regSceneInnerPane);
-        regSceneInnerPane.setPadding(new Insets(0, 40, 20, 40));
-        
+        regSceneInnerPane.setPadding(new Insets(0, 40, 20, 40));      
+       
         // Controls for individual student view
         Button studentViewButton = new Button("Go to student page");
         studentViewButton.setVisible(false);
@@ -308,7 +317,47 @@ public class KurssihallintaUi extends Application {
         regSceneControls.getChildren().addAll(addRegButton, selectStudent, studentViewButton);
         regSceneInnerPane.setBottom(regSceneControls);
         
-        regScene = new Scene(regSceneCorePane, 900, 700);       
+        regScene = new Scene(regSceneCorePane, 900, 700);      
+        
+        // Lesson scene
+        BorderPane lessonsSceneInnerPane = new BorderPane();
+        lessonsSceneCorePane.setPadding(new Insets(10, 10, 10, 10));
+        lessonsSceneInnerPane.setPadding(new Insets(10, 40, 20, 40));   
+        GridPane lessonsSceneControls = new GridPane();
+        lessonsSceneControls.setHgap(10);
+        lessonsSceneControls.setVgap(10);
+        
+        Button addClassroom = new Button("Add a new classroom");
+        Button saveClassroom = new Button("Save");
+        TextField classroomTextField = new TextField();
+        ChoiceBox<String> selectClassroom = new ChoiceBox();
+        DatePicker selectDate = new DatePicker();
+        selectClassroom.getItems().addAll(service.getClassrooms());
+        lessonsSceneControls.addRow(0, addClassroom);
+        lessonsSceneControls.addRow(1, selectClassroom, selectDate);
+        
+        
+        saveClassroom.setOnMouseClicked((event) -> {
+            if (!classroomTextField.getText().isBlank()) {
+                Classroom classroom = new Classroom(classroomTextField.getText());
+                if (!service.addClassroom(classroom)) {
+                    System.out.println("virhe");
+                }             
+            }
+            
+            lessonsSceneControls.getChildren().removeAll(classroomTextField, saveClassroom);
+            lessonsSceneControls.addRow(0, addClassroom);
+        });
+        
+        addClassroom.setOnMouseClicked((event) -> {
+            lessonsSceneControls.getChildren().remove(addClassroom);
+            lessonsSceneControls.addRow(0, classroomTextField, saveClassroom);           
+        });
+        
+        lessonsSceneCorePane.setCenter(lessonsSceneInnerPane);
+        lessonsSceneInnerPane.setCenter(tableControl.getLessonTable(service.getLessons()));
+        lessonsSceneInnerPane.setTop(lessonsSceneControls);
+        lessonsScene = new Scene(lessonsSceneCorePane, 900, 700);
         
         // Initial settings
         stage.setScene(courseScene);
@@ -474,15 +523,18 @@ public class KurssihallintaUi extends Application {
     
     private Node getIndividualCourseView(Course course) {
         BorderPane indCourse = new BorderPane();
-        GridPane courseInfo = new GridPane();    
+        GridPane courseInfo = new GridPane();
+        BorderPane lessonPane = new BorderPane();
+        GridPane lessonInfo = new GridPane();
         
         Button editButton = new Button("Edit course info");
+        Button lessonButton = new Button("Edit lessons");
         Font headerFont = new Font("Arial", 20);
         Label header = new Label(course.getName());
         Label tableHeader = new Label("Registered students: ");
         header.setFont(headerFont);
         tableHeader.setFont(headerFont);
-        courseInfo.addRow(0, header, editButton);
+        courseInfo.addRow(0, header, editButton, lessonButton);
         courseInfo.add(tableHeader, 0, 6);
         
         Label startDate = new Label(course.getStartDate());
@@ -494,9 +546,6 @@ public class KurssihallintaUi extends Application {
         Label students = new Label(course.getStudents() + " / " + course.getMaxStudents());
         courseInfo.addRow(5, new Label("Students registered / max:"), students);
 
-//        Pane spring = new Pane();
-//        spring.setPrefSize(0, 20);
-//        courseInfo.add(spring, 0, 5);
         indCourse.setPadding(new Insets(20, 0, 0, 0));
         courseInfo.setVgap(15);
         courseInfo.setHgap(10);
@@ -507,6 +556,44 @@ public class KurssihallintaUi extends Application {
         TextField teacherEdit = new TextField();
         Spinner<Integer> maxStudentsEdit = new Spinner<>();
         SpinnerValueFactory spinnerValues = new IntegerSpinnerValueFactory(0, 50, course.getMaxStudents());
+        
+        // Controls for adding lessons
+        DateTimePicker startTimepicker = new DateTimePicker();
+        DateTimePicker endTimepicker = new DateTimePicker();  
+        endTimepicker.setOnMouseClicked((event) -> { 
+            endTimepicker.setValue(startTimepicker.getValue());
+        });
+        
+        ChoiceBox<String> classrooms = new ChoiceBox();
+        classrooms.getItems().addAll(service.getClassrooms());
+        
+        
+        Button addLesson = new Button("Add lesson");
+        addLesson.setOnMouseClicked((event) -> { 
+            Lesson lesson = new Lesson(course, classrooms.getValue(), startTimepicker.getValue(), startTimepicker.dateTimeValueProperty().getValue().toLocalTime(), endTimepicker.dateTimeValueProperty().getValue().toLocalTime());
+            service.addLesson(lesson);
+            table.getItems().add(lesson);
+            table.refresh();
+        });
+        
+        lessonInfo.addRow(1, addLesson);
+        lessonInfo.addRow(2, new Label("Classroom:"), classrooms);
+        lessonInfo.addRow(3, new Label("Starts at:"), startTimepicker);
+        lessonInfo.addRow(4, new Label("Ends at:"), endTimepicker);
+        Scene testi = new Scene(lessonPane);
+        Stage ikkuna = new Stage();
+        ikkuna.initModality(Modality.WINDOW_MODAL);
+        
+        lessonButton.setOnMouseClicked((event) -> {
+            table = tableControl.getLessonTable(service.searchLessonsByCourseName(course.getName()));
+            lessonPane.setCenter(table);
+            lessonPane.setTop(lessonInfo);
+            ikkuna.setOnHidden((e) -> { 
+               
+           });
+            ikkuna.setScene(testi);
+            ikkuna.show();
+        });
         
         Button saveButton = new Button("Save changes");
         saveButton.setOnMouseClicked((event) -> {

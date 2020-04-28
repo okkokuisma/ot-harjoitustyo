@@ -12,14 +12,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
-import kurssihallinta.database.TestCourseDao;
-import kurssihallinta.database.TestRegistrationDao;
-import kurssihallinta.database.TestStudentDao;
+import kurssihallinta.dao.TestClassroomDao;
+import kurssihallinta.dao.TestCourseDao;
+import kurssihallinta.dao.TestLessonDao;
+import kurssihallinta.dao.TestRegistrationDao;
+import kurssihallinta.dao.TestStudentDao;
+import kurssihallinta.domain.Classroom;
 import kurssihallinta.domain.Course;
+import kurssihallinta.domain.Lesson;
 import kurssihallinta.domain.Student;
 import kurssihallinta.ui.KurssihallintaUi;
 import org.junit.After;
@@ -37,6 +42,8 @@ public class DatabaseTest {
     TestCourseDao courseDao;
     TestStudentDao studentDao;
     TestRegistrationDao registrationDao;
+    TestClassroomDao classroomDao;
+    TestLessonDao lessonDao;
     
     public DatabaseTest() {
     }
@@ -51,6 +58,11 @@ public class DatabaseTest {
     
     @Before
     public void setUp() {
+        courseDao = new TestCourseDao();
+        studentDao = new TestStudentDao();
+        registrationDao = new TestRegistrationDao();
+        classroomDao = new TestClassroomDao();
+        lessonDao = new TestLessonDao();
         
         try {
             Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -95,13 +107,29 @@ public class DatabaseTest {
                 ps.setInt(1, i);
                 ps.execute();
             }
+            
+            // Add 10 classrooms
+            ps = db.prepareStatement("INSERT INTO Classrooms (name) VALUES (?)");
+            for (int i = 0; i < 10; i++) {
+                ps.setString(1, "Room" + i); 
+                ps.execute();
+            }
+            
+            // Add 10 lessons
+            ps = db.prepareStatement("INSERT INTO Lessons (course_id,classroom_id,date,starttime,endtime) VALUES (?,?,?,?,?)");
+            LocalTime time = LocalTime.now();
+            for (int i = 0; i < 10; i++) {
+                ps.setInt(1, 1);
+                ps.setInt(2, 1);
+                ps.setString(3, date.toString());
+                ps.setString(4, time.toString());
+                ps.setString(5, time.toString());
+                ps.execute();
+            }
         } catch (SQLException ex) {
             Logger.getLogger(KurssihallintaUi.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        courseDao = new TestCourseDao();
-        studentDao = new TestStudentDao();
-        registrationDao = new TestRegistrationDao();
     }
     
     @After
@@ -158,6 +186,29 @@ public class DatabaseTest {
         courses = courseDao.search("course");
         assertEquals(10, courses.size());
     }
+    
+    @Test
+    public void courseDaoGetId() throws SQLException {
+        int id = courseDao.getId("course0");
+        assertEquals(1, id);
+        
+        id = courseDao.getId("course9");
+        assertEquals(10, id);
+    }
+    
+    @Test
+    public void courseDaoGetCourse() throws SQLException {
+        Course course = courseDao.get(1);
+        assertEquals("course0", course.getName());
+        
+        course = courseDao.get(10);
+        assertEquals("course9", course.getName());
+    }
+    
+    @Test
+    public void courseDaoGetAll() throws SQLException {
+        assertEquals(10, courseDao.getAll().size());
+    }
 
     @Test
     public void studentDaoAdd() throws SQLException {
@@ -208,8 +259,31 @@ public class DatabaseTest {
     }
     
     @Test
-    public void registrationDaoAdd() throws SQLException {
+    public void studentDaoGetId() throws SQLException {
+        int id = studentDao.getId("id0");
+        assertEquals(1, id);
         
+        id = studentDao.getId("id9");
+        assertEquals(10, id);
+        
+    }
+    
+    @Test
+    public void studentDaoGetCourse() throws SQLException {
+        Student student = studentDao.get(1);
+        assertEquals("id0", student.getId());
+        
+        student = studentDao.get(10);
+        assertEquals("id9", student.getId());
+    }
+    
+    @Test
+    public void studentDaoGetAll() throws SQLException {
+        assertEquals(10, studentDao.getAll().size());
+    }
+    
+    @Test
+    public void registrationDaoAdd() throws SQLException {      
         for (int i = 0; i < 10; i++) {
             registrationDao.add("course0", "id" + i);
         }
@@ -228,29 +302,65 @@ public class DatabaseTest {
     
     @Test
     public void registrationDaoSearchByStudents() throws SQLException {      
-        ObservableList registrations = registrationDao.searchRegistrationsByStudents("xxx");
-        assertTrue(registrations == null);
-        
-        registrations = registrationDao.searchRegistrationsByStudents("id0");
+        ObservableList registrations = registrationDao.searchRegistrationsByStudents(1);
         assertEquals(1, registrations.size());
     }
     
     @Test
     public void registrationDaoSearchByCourses() throws SQLException {        
-        ObservableList registrations = registrationDao.searchRegistrationsByCourses("xxx");
-        assertTrue(registrations == null);
-        
-        registrations = registrationDao.searchRegistrationsByCourses("course0");
+        ObservableList registrations = registrationDao.searchRegistrationsByCourses(1);
         assertEquals(10, registrations.size());
     }
     
     @Test
-    public void addingRegistrationsIncrementsStudentCountInCourses() throws SQLException {  
+    public void classroomDaoAdd() throws SQLException {     
         for (int i = 0; i < 10; i++) {
-            registrationDao.add("course1", "id" + i);
+            Classroom classroom = new Classroom("Classroom" + i);
+            classroomDao.add(classroom);
         }
         
-        Course course = (Course) courseDao.search("course1").get(0);
-        assertEquals(10, course.getStudents());
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        Statement s = db.createStatement();
+        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Classrooms");
+        int classrooms = rs.getInt(1);
+        db.close();
+        
+        assertEquals(20, classrooms);
+    }
+    
+    @Test
+    public void classroomDaoGetAll() throws SQLException {
+        assertEquals(10, classroomDao.getAll().size());
+    }
+    
+    @Test
+    public void lessonDaoAdd() throws SQLException {     
+        LocalDate date = LocalDate.now();
+        LocalTime time = LocalTime.now();        
+        for (int i = 0; i < 10; i++) {
+            Course course = new Course("name" + i, date, date, "teacher" + i, i, i);
+            courseDao.add(course);
+            Lesson lesson = new Lesson(course, "Room" + i, date, time, time);
+            lessonDao.add(lesson);
+        }
+        
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        Statement s = db.createStatement();
+        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Lessons");
+        int lessons = rs.getInt(1);
+        db.close();
+        
+        assertEquals(20, lessons);
+    }
+    
+    @Test
+    public void lessonDaoSearch() throws SQLException {
+        assertEquals(null, lessonDao.search("course09"));
+        assertEquals(10, lessonDao.search("course0").size());
+    }
+    
+    @Test
+    public void lessonDaoGetAll() throws SQLException {
+        assertEquals(10, lessonDao.getAll().size());
     }
 }

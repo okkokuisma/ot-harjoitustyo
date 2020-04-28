@@ -10,15 +10,23 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import kurssihallinta.domain.Course;
+import kurssihallinta.domain.Lesson;
 import kurssihallinta.domain.Student;
 
 /**
  *
- * @author okkokuisma
+ * A utility class used to control the contents of a TableView object.
  */
 public class TableViewController {
     private TableView table;
     
+    /**
+    * Creates and returns a TableView object of Student objects.
+    * 
+    * @param    students    ObservableList of Student objects
+    * 
+    * @return TableView object of the Student objects
+    */
     public TableView getStudentTable(ObservableList students) {
         table = new TableView<Student>();
         TableColumn<Student, String> firstNameCol = new TableColumn<>("First name");
@@ -44,6 +52,13 @@ public class TableViewController {
         return table;
     }
     
+    /**
+    * Creates and returns a TableView object of Course objects.
+    * 
+    * @param    courses    ObservableList of Course objects
+    * 
+    * @return TableView object of the Course objects
+    */
     public TableView getCourseTable(ObservableList courses) {
         table = new TableView<Course>();       
         TableColumn<Course, String> nameCol = new TableColumn<>("Name");
@@ -58,6 +73,32 @@ public class TableViewController {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setMaxSize(800, 300);
         table.setItems(courses);
+        return table;
+    }
+    
+    /**
+    * Creates and returns a TableView object of Lesson objects.
+    * 
+    * @param    lessons    ObservableList of Lesson objects
+    * 
+    * @return TableView object of the Lesson objects
+    */
+    public TableView getLessonTable(ObservableList lessons) {
+        table = new TableView<Lesson>();       
+        TableColumn<Lesson, String> courseCol = new TableColumn<>("Course");
+        courseCol.setCellValueFactory(new PropertyValueFactory("courseName"));
+        TableColumn<Lesson, String> classroomCol = new TableColumn<>("Classroom");
+        classroomCol.setCellValueFactory(new PropertyValueFactory("classroom"));
+        TableColumn<Course, String> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory("date"));
+        TableColumn<Course, String> startTimeCol = new TableColumn<>("Starts at");
+        startTimeCol.setCellValueFactory(new PropertyValueFactory("startTime"));
+        TableColumn<Course, String> endTimeCol = new TableColumn<>("Ends at");
+        endTimeCol.setCellValueFactory(new PropertyValueFactory("endTime"));
+        table.getColumns().setAll(courseCol, classroomCol, dateCol, startTimeCol, endTimeCol);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setMaxSize(800, 300);
+        table.setItems(lessons);
         return table;
     }
 

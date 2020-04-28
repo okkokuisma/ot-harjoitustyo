@@ -18,6 +18,9 @@ public class Student {
     private String city;
     private String country;
     private String email;
+    
+    public Student() {
+    }
 
     public Student(String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
         this.firstName = firstName;

@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package kurssihallinta.database;
+package kurssihallinta.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Student;
@@ -77,6 +78,49 @@ public class TestStudentDao implements KurssihallintaDao<Student, String> {
         }
         
         db.close();
-        return students;    
+        return students;
+    }
+
+    @Override
+    public int getId(String key) throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Students WHERE id_number = ?");
+        ps.setString(1, key);
+        ResultSet queryResults = ps.executeQuery();
+        int studentId = queryResults.getInt(1);
+        db.close();
+        
+        return studentId;
+    }
+
+    @Override
+    public Student get(int key) throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE id = ?");
+        ps.setInt(1, key);
+        ResultSet queryResults = ps.executeQuery();
+        Student student = new Student(queryResults.getString(2), queryResults.getString(3), queryResults.getString(4), queryResults.getString(5), queryResults.getString(6), queryResults.getString(7), queryResults.getString(8), queryResults.getString(9));
+        db.close();
+        
+        return student;
+    }
+    
+    @Override
+    public ObservableList getAll() throws SQLException {
+        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
+        Statement ps = db.createStatement();
+
+        ResultSet queryResults = ps.executeQuery("SELECT * FROM Students");
+        
+        // CREATE A LIST OBJECT FROM QUERY RESULTS
+        ObservableList<Student> students = FXCollections.observableArrayList();
+        while (queryResults.next()) {
+            Student student = new Student(queryResults.getString(2), queryResults.getString(3), queryResults.getString(4), queryResults.getString(5), queryResults.getString(6), queryResults.getString(7), queryResults.getString(8), queryResults.getString(9));
+            students.add(student);
+        }
+        
+        db.close();
+        
+        return students;
     }
 }

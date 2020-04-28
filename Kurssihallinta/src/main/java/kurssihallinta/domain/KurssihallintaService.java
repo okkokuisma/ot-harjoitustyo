@@ -11,10 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import kurssihallinta.database.CourseDao;
-import kurssihallinta.database.KurssihallintaDao;
-import kurssihallinta.database.RegistrationDao;
-import kurssihallinta.database.StudentDao;
+import javafx.scene.control.MenuItem;
+import kurssihallinta.dao.ClassroomDao;
+import kurssihallinta.dao.CourseDao;
+import kurssihallinta.dao.KurssihallintaDao;
+import kurssihallinta.dao.LessonDao;
+import kurssihallinta.dao.RegistrationDao;
+import kurssihallinta.dao.StudentDao;
 
 /**
  *
@@ -22,12 +25,16 @@ import kurssihallinta.database.StudentDao;
  */
 public class KurssihallintaService {
     KurssihallintaDao students;
-    KurssihallintaDao courses;
+    CourseDao courses;
+    KurssihallintaDao lessons;
+    KurssihallintaDao classrooms;
     RegistrationDao registrations;
     
     public KurssihallintaService() {
         students = new StudentDao();
         courses = new CourseDao();
+        lessons = new LessonDao();
+        classrooms = new ClassroomDao();
         registrations = new RegistrationDao();
     }
     
@@ -54,9 +61,34 @@ public class KurssihallintaService {
     
     public boolean addRegistration(String courseName, String studentIdNum) {
         try {
+//            int studentId = students.getId(studentIdNum);
+//            int courseId = courses.getId(courseName);
             registrations.add(courseName, studentIdNum);
+//            courses.incrementStudentCount(courseId);
         } catch (SQLException ex) {
+            ex.printStackTrace();
             return false;
+        }
+        
+        return true;
+    }
+    
+    public boolean addLesson(Lesson lesson) {
+        try {
+            lessons.add(lesson);
+        } catch (SQLException ex) {
+            System.out.println("virhe");
+            ex.printStackTrace();
+        }
+        
+        return true;
+    }
+    
+    public boolean addClassroom(Classroom classroom) {
+        try {
+            classrooms.add(classroom);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         
         return true;
@@ -85,7 +117,8 @@ public class KurssihallintaService {
     public ObservableList searchRegistrationsByStudentId(String searchWord) {
         ObservableList<Course> courseList = FXCollections.observableArrayList();
         try {
-            courseList = registrations.searchRegistrationsByStudents(searchWord);
+            int studentId = students.getId(searchWord);
+            courseList = registrations.searchRegistrationsByStudents(studentId);
         } catch (SQLException ex) { 
         }
         
@@ -95,11 +128,49 @@ public class KurssihallintaService {
     public ObservableList searchRegistrationsByCourseName(String searchWord) {
         ObservableList<Student> studentList = FXCollections.observableArrayList();
         try {
-            studentList = registrations.searchRegistrationsByCourses(searchWord);
+            int courseId = courses.getId(searchWord);
+            studentList = registrations.searchRegistrationsByCourses(courseId);
         } catch (SQLException ex) { 
         }
         
         return studentList;
+    }
+    
+    public ObservableList searchLessonsByCourseName(String searchWord) {
+        ObservableList<Student> lessonList = FXCollections.observableArrayList();
+        try {
+            
+            lessonList = lessons.search(searchWord);
+        } catch (SQLException ex) { 
+        }
+        
+        return lessonList;
+    }
+    
+    public ObservableList<String> getClassrooms() {
+        ObservableList<Classroom> classroomList = FXCollections.observableArrayList();
+        ObservableList<String> classroomsString = FXCollections.observableArrayList();
+        try {
+            classroomList = classrooms.getAll();
+        } catch (SQLException ex) {
+            Logger.getLogger(KurssihallintaService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        for (Classroom c : classroomList) {
+            String name = c.getName();
+            classroomsString.add(name);
+        }
+        return classroomsString;
+    }
+    
+    public ObservableList getLessons() {
+        ObservableList<Lesson> lessonList = FXCollections.observableArrayList();
+        try {
+            lessonList = lessons.getAll();
+        } catch (SQLException ex) {        
+        }
+        
+        return lessonList;
     }
     
     public boolean updateCourse(Course course) {
@@ -121,4 +192,24 @@ public class KurssihallintaService {
         
         return true;
     }
+//    
+//    public boolean getCourseId(Course course) {
+//        try {
+//            courses.getId(course);
+//        } catch (SQLException ex) {
+//            return false;
+//        }
+//        
+//        return true;
+//    }
+//    
+//    public boolean getStudentId(Student student) {
+//        try {
+//            students.getId(student);
+//        } catch (SQLException ex) {
+//            return false;
+//        }
+//        
+//        return true;
+//    }
 }

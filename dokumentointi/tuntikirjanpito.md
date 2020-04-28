@@ -7,4 +7,6 @@ Päivä | Tunteja | Mitä tein
 7.4. | 8 | sovelluslogiikan erriyttämistä, luokkakaaviot, ui:n rakenteen päivittäminen
 20.4. | 4 | kurssi- ja opiskelijatietojen muokkaustoiminnallisuus
 21.4. | 2 | sekvenssikaavio, release
-yht | 34 |
+27.4. | 8 | oppituntien lisäystoiminnallisuus
+28.4. | 8 | dokumentointia, bugien kiroamista
+yht | 50 |
