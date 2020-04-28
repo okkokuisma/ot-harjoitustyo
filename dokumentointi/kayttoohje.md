@@ -15,6 +15,6 @@ Lisättyäsi kurssin voit etsiä sitä nimeltä hakupalkin avulla:
 
 ## Uuden opiskelijan luominen ja kurssirekisteröinnin lisääminen
 Uuden opiskelijan voit lisätä tietokantaan siirtymällä sovelluksen yläpalkin "Registrations"-painikkeesta ilmoittautumisnäkymään. Painamalla alapalkin painiketta "Add a new registration" pääset näkymään, jossa voit valita, haluatko ilmoittaa kurssille tietokannasta jo löytyvän opiskelijan vai haluatko lisätä tietokantaan kokonaan uuden opiskelijan:
-(https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/valintanakyma.png)
+![Valintanakyma](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/valintanakyma.png)
 
 Lisättyäsi opiskelijan tiedot ja painettuasi "Add to database"-painiketta ilmestyy sovellukseen uusi hakupalkki, josta voit etsiä tietokantaan lisättyjä kursseja. Valitse haluamasi kurssi painamalla sitä, jolloin se muuttuu siniseksi, ja paina "Select course"-painiketta. Kurssi-ilmoittautuminen on nyt lisätty.
