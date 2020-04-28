@@ -8,5 +8,9 @@ Sovelluksen avulla opiston tai koulun on mahdollista pitää kirjaa sen järjest
 
 [Arkkitehtuurikuvaus](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/arkkitehtuuri.md)
 
+[Käyttöohje](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kayttoohje.md)
+
 ## Releaset
 [Viikko 5](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/viikko5)
+
+[Viikko 6](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/viikko6)
