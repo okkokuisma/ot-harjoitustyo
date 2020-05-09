@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import kurssihallinta.dao.DatabaseUtil;
@@ -36,7 +37,8 @@ public class ServiceTest {
     KurssihallintaService service;
     Student student;
     Course course;
-    Lesson lesson;
+    Lesson lesson1;
+    Lesson lesson2;
     Classroom classroom;
     
     public ServiceTest() {
@@ -49,8 +51,9 @@ public class ServiceTest {
         service.setDbUtil(dbUtil);
         student = new Student("John", "Smith", "id123", "High Road", "20210", "New York", "USA", "john.smith.com");
         course = new Course("German 1", LocalDate.now(), LocalDate.now(), "Matti", 0, 10);
-        lesson = new Lesson(course, "Classroom 1", LocalDate.now(), LocalTime.now(), LocalTime.now());
-        classroom = new Classroom("Classroom 1");
+        lesson1 = new Lesson(course, "Classroom 2", LocalDate.now(), LocalTime.now(), LocalTime.now());
+        lesson2 = new Lesson(course, "Classroom 2", LocalDate.of(2001, Month.MARCH, 1), LocalTime.now(), LocalTime.now());
+        classroom = new Classroom("Classroom 2");
         
         try {
             Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -100,13 +103,47 @@ public class ServiceTest {
         assertEquals(1, c.getStudents());
     }
     
-//    @Test
-//    public void getLessonsFilteredByClassroom() {
-//        service.addCourse(course);
-//        service.addClassroom(classroom);
-//        service.addClassroom(new Classroom("Classroom 2"));
-//        assertTrue(service.addLesson(lesson));
-//        service.addLesson(new Lesson(course, "Classroom 2", LocalDate.now(), LocalTime.now(), LocalTime.now()));
-//        //assertEquals(1, service.getLessonsFilteredByClassroom("Classroom 2").size());
-//    }
+    @Test
+    public void getLessonsFilteredByClassroom() {
+        service.addCourse(course);
+        service.addClassroom(classroom);
+        service.addLesson(lesson1);
+        assertEquals(1, service.getLessonsFilteredByClassroom("Classroom 2").size());
+        
+        service.addLesson(lesson2);
+        assertEquals(2, service.getLessonsFilteredByClassroom("Classroom 2").size());
+    }
+    
+    @Test
+    public void getLessonsFilteredByDate() {
+        service.addCourse(course);
+        service.addClassroom(classroom);
+        service.addLesson(lesson1);
+        assertEquals(1, service.getLessonsFilteredByDate(LocalDate.now()).size());
+        
+        service.addLesson(lesson2);
+        assertEquals(1, service.getLessonsFilteredByDate(LocalDate.now()).size());
+    }
+    
+    @Test
+    public void getLessonsFilteredByClassroomAndDate() {
+        service.addCourse(course);
+        service.addClassroom(classroom);
+        service.addLesson(lesson1);
+        assertEquals(1, service.getLessonsFilteredByClassroomAndDate("Classroom 2", LocalDate.now()).size());
+        
+        service.addLesson(lesson2);
+        assertEquals(1, service.getLessonsFilteredByClassroomAndDate("Classroom 2", lesson2.getDate()).size());
+        assertEquals(0, service.getLessonsFilteredByClassroomAndDate("Classroom 1", lesson2.getDate()).size());
+        assertEquals(0, service.getLessonsFilteredByClassroomAndDate("Classroom 2", LocalDate.of(1999, Month.MARCH, 1)).size());
+    }
+    
+    @Test
+    public void getClassroomsReturnsAllClassrooms() {
+        assertEquals(0, service.getClassrooms().size());
+        service.addClassroom(classroom);
+        assertEquals(1, service.getClassrooms().size());
+        service.addClassroom(new Classroom("Classroom 3"));
+        assertEquals(2, service.getClassrooms().size());
+    }
 }

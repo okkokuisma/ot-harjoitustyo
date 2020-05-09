@@ -6,13 +6,10 @@
 package kurssihallinta.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Student;
@@ -27,6 +24,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * Adds the Student object given as a parameter to database.
     *
     * @param    student  Student object to be added to database
+    * @throws java.sql.SQLException
     */
     @Override
     public void add(Student student) throws SQLException {
@@ -47,6 +45,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * Changes the data in the Students table of a Student object given as a parameter.
     *
     * @param    student  Student object with the data to be modified
+    * @throws java.sql.SQLException
     */
     @Override
     public void update(Student student) throws SQLException {
@@ -76,6 +75,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * @param    key  Search word given by user
     * 
     * @return   ObservableList of Student objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList search(String key) throws SQLException {
@@ -102,6 +102,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * @param    key  The id_number of a student
     * 
     * @return   Integer primary key
+    * @throws java.sql.SQLException
     */
     @Override
     public int getId(String key) throws SQLException {
@@ -120,6 +121,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * @param    key  Integer primary key
     * 
     * @return   Student object with the retrieved data
+    * @throws java.sql.SQLException
     */
     @Override
     public Student get(int key) throws SQLException {
@@ -136,6 +138,7 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * Retrieves all rows from Students table.
     * 
     * @return   ObservableList of Student objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList getAll() throws SQLException {

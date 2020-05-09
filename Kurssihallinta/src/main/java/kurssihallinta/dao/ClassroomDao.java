@@ -6,16 +6,13 @@
 package kurssihallinta.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Classroom;
-import kurssihallinta.domain.Course;
 
 /**
  *
@@ -27,6 +24,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * Adds the Classroom object given as a parameter to database.
     *
     * @param    classroom  Classroom object to be added to database
+    * @throws java.sql.SQLException
     */
     @Override
     public void add(Classroom classroom) throws SQLException {
@@ -41,6 +39,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * Changes the data in the Classrooms table of a Classroom object given as a parameter.
     *
     * @param    classroom  Classroom object with the data to be modified
+    * @throws java.sql.SQLException
     */
     @Override
     public void update(Classroom classroom) throws SQLException {
@@ -53,6 +52,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * @param    key  Search word given by user
     * 
     * @return   ObservableList of Classroom objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList search(String key) throws SQLException {
@@ -78,6 +78,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * @param    key  The name of a Classroom
     * 
     * @return   Integer primary key
+    * @throws java.sql.SQLException
     */
     @Override
     public int getId(String key) throws SQLException {
@@ -96,6 +97,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * @param    key  Integer primary key
     * 
     * @return   Classroom object with the retrieved data
+    * @throws java.sql.SQLException
     */
     @Override
     public Classroom get(int key) throws SQLException {
@@ -112,6 +114,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     * Retrieves all rows from Classrooms table.
     * 
     * @return   ObservableList of Classroom objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList getAll() throws SQLException {

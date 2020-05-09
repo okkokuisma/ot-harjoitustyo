@@ -7,10 +7,8 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,9 +33,7 @@ import kurssihallinta.domain.Lesson;
 import kurssihallinta.domain.Student;
 import kurssihallinta.ui.KurssihallintaUi;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -305,24 +301,6 @@ public class DaoTest {
         assertEquals(10, studentDao.getAll().size());
     }
     
-//    @Test
-//    public void registrationDaoAdd() throws SQLException {      
-//        for (int i = 0; i < 10; i++) {
-//            registrationDao.add("course0", "id" + i);
-//        }
-//        
-//        Connection db = DriverManager.getConnection("jdbc:sqlite:test.db");
-//        Statement s = db.createStatement();
-//        ResultSet rs = s.executeQuery("SELECT COUNT(*) FROM Registrations");
-//        int registrations = rs.getInt(1);
-//        rs = s.executeQuery("SELECT COUNT(*) FROM Registrations WHERE course_id = 1");
-//        int registrationsByCourse = rs.getInt(1);
-//        db.close();
-//        
-//        assertEquals(20, registrations);
-//        assertEquals(20, registrationsByCourse);
-//    }
-    
     @Test
     public void registrationDaoSearchByStudents() throws SQLException {      
         registrationDao.setConnection(dbUtil.getConnection());
@@ -384,8 +362,6 @@ public class DaoTest {
     
     @Test
     public void lessonDaoSearch() throws SQLException {
-//        lessonDao.setConnection(dbUtil.getConnection());
-//        assertEquals(null, lessonDao.search("course09"));
         lessonDao.setConnection(dbUtil.getConnection());
         assertEquals(10, lessonDao.search("course0").size());
     }

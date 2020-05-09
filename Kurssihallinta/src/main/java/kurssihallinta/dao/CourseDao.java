@@ -6,14 +6,11 @@
 package kurssihallinta.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Course;
@@ -28,6 +25,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * Adds the Course object given as a parameter to database.
     *
     * @param    course  Course object to be added to database
+    * @throws java.sql.SQLException
     */
     @Override
     public void add(Course course) throws SQLException {
@@ -47,6 +45,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * Changes the data in the database of a Course object given as a parameter.
     *
     * @param    course  Course object with the data to be modified
+    * @throws java.sql.SQLException
     */
     @Override
     public void update(Course course) throws SQLException {
@@ -72,6 +71,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * @param    key  Search word given by user
     * 
     * @return   ObservableList of Course objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList search(String key) throws SQLException {
@@ -100,6 +100,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * @param    key  Course name
     * 
     * @return   Integer primary key
+    * @throws java.sql.SQLException
     */
     @Override
     public int getId(String key) throws SQLException {
@@ -118,6 +119,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * @param    key  Integer primary key
     * 
     * @return   Course object with the retrieved data
+    * @throws java.sql.SQLException
     */
     @Override
     public Course get(int key) throws SQLException {
@@ -136,6 +138,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * Retrieves all rows from Courses table.
     * 
     * @return   ObservableList of Course objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList getAll() throws SQLException {
@@ -160,6 +163,7 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * Increments the students column value by one of a row with matching integer primary key value.
     * 
     * @param    courseId    Integer primary key
+    * @throws java.sql.SQLException
     */
     public void incrementStudentCount(int courseId) throws SQLException {
         PreparedStatement ps = db.prepareStatement("UPDATE Courses SET students = students + 1 WHERE id = ?");

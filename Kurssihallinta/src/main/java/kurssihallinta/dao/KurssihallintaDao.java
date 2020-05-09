@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
 
 /**
  *
- * @author okkokuisma
+ * Interface class for DAO objects.
  */
 public interface KurssihallintaDao<T, K> {
     void add(T object) throws SQLException;

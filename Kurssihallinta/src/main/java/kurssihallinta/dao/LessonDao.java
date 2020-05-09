@@ -38,6 +38,7 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     * Adds the Lesson object given as a parameter to database.
     *
     * @param    lesson  Lesson object to be added to database
+    * @throws java.sql.SQLException
     */
     @Override
     public void add(Lesson lesson) throws SQLException {
@@ -72,6 +73,7 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     * @param    courseName  Course name
     * 
     * @return   ObservableList of Lesson objects
+    * @throws java.sql.SQLException
     */
     @Override
     public ObservableList search(String courseName) throws SQLException {
@@ -102,7 +104,13 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     public Lesson get(int key) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    /**
+    * Retrieves all rows from Lessons table.
+    * 
+    * @return   ObservableList of Lesson objects
+    * @throws java.sql.SQLException
+    */
     @Override
     public ObservableList getAll() throws SQLException {
         Statement ps = db.createStatement();

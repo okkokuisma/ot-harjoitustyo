@@ -21,7 +21,7 @@ import kurssihallinta.ui.KurssihallintaUi;
 
 /**
  *
- * @author okkokuisma
+ * Utility class for creating database tables and managing connections between DAO objects and the database.
  */
 public class DatabaseUtil {
     Connection db;
