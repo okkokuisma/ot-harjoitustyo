@@ -7,8 +7,10 @@ package kurssihallinta.dao;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -42,9 +44,9 @@ public class DatabaseUtil {
                 properties.load(input);
                 databasePath = "jdbc:sqlite:" + properties.getProperty("dbFile") + ".db";
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Missing config.properties file.");
             } catch (IOException ex) {
-                Logger.getLogger(DatabaseUtil.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Missing config.properties file.");
             }
 
             try {
