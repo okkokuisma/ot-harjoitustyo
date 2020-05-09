@@ -256,7 +256,7 @@ public class KurssihallintaUi extends Application {
             }
             Student student = new Student(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
             service.addStudent(student);
-            regSceneInnerPane.setCenter(addRegistration(student));
+            regSceneInnerPane.setCenter(addRegistrationView(student));
         });
         
         studentAddView.addRow(8, addStudentButton, regSceneMessage);
@@ -271,7 +271,7 @@ public class KurssihallintaUi extends Application {
         selectStudentButton.setVisible(false);
         selectStudentButton.setOnMouseClicked((event) -> {
             if (table.getSelectionModel().getSelectedItem() instanceof Student) {
-                regSceneInnerPane.setCenter(addRegistration((Student) table.getSelectionModel().getSelectedItem()));
+                regSceneInnerPane.setCenter(addRegistrationView((Student) table.getSelectionModel().getSelectedItem()));
                 selectStudentButton.setVisible(false);
                 indStudentViewButton.setVisible(false);
             }
@@ -377,7 +377,7 @@ public class KurssihallintaUi extends Application {
     * @param student A Student object chosen by the user
     * @return Node object of the registration view
     */
-    private Node addRegistration(Student student) {
+    private Node addRegistrationView(Student student) {
         BorderPane regPane = new BorderPane();
         regPane.setPadding(new Insets(70, 0, 15, 0));
         Button selectCourse = new Button("Select course");
