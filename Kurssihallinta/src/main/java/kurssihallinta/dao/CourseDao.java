@@ -23,6 +23,7 @@ import kurssihallinta.domain.Course;
  * Data Access Object used to manage database operations with Course objects.
  */
 public class CourseDao implements KurssihallintaDao<Course, String> {
+    private Connection db;
     /**
     * Adds the Course object given as a parameter to database.
     *
@@ -30,7 +31,6 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     */
     @Override
     public void add(Course course) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("INSERT INTO Courses (name,startdate,enddate,teacher,students,max_students) VALUES (?,?,?,?,?,?)");
         ps.setString(1, course.getName());
         ps.setString(2, course.getStartDate());
@@ -50,7 +50,6 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     */
     @Override
     public void update(Course course) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("UPDATE Courses SET "
                 + "startdate = ?, "
                 + "enddate = ?, "
@@ -76,7 +75,6 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     */
     @Override
     public ObservableList search(String key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         String searchWord = "%" + key + "%";
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE name LIKE ?");
         ps.setString(1, searchWord);
@@ -104,28 +102,14 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * @return   Integer primary key
     */
     @Override
-    public int getId(String key) {
-        Connection db = null;
-        try {
-            db = DriverManager.getConnection("jdbc:sqlite:database.db");
-            PreparedStatement ps = db.prepareStatement("SELECT id FROM Courses WHERE name = ?");
-            ps.setString(1, key);
-            ResultSet queryResults = ps.executeQuery();
-//        if (!queryResults.next()) {
-//            return -1;
-//        }
-            int courseId = queryResults.getInt(1);
-            db.close();
+    public int getId(String key) throws SQLException {
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Courses WHERE name = ?");
+        ps.setString(1, key);
+        ResultSet queryResults = ps.executeQuery();
+        int courseId = queryResults.getInt(1);
+        db.close();
 
-            return courseId;
-        } catch (SQLException ex) {
-            try {
-                db.close();
-            } catch (SQLException ex1) {
-                Logger.getLogger(CourseDao.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
-        return -1;
+        return courseId;
     }
     
     /**
@@ -137,7 +121,6 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     */
     @Override
     public Course get(int key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE id = ?");
         ps.setInt(1, key);
         ResultSet queryResults = ps.executeQuery();
@@ -156,7 +139,6 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     */
     @Override
     public ObservableList getAll() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement ps = db.createStatement();
 
         ResultSet queryResults = ps.executeQuery("SELECT * FROM Courses");
@@ -180,11 +162,15 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     * @param    courseId    Integer primary key
     */
     public void incrementStudentCount(int courseId) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("UPDATE Courses SET students = students + 1 WHERE id = ?");
         ps.setInt(1, courseId);
         ps.execute();
         db.close();
+    }
+
+    @Override
+    public void setConnection(Connection db) throws SQLException {
+        this.db = db;
     }
 
 }

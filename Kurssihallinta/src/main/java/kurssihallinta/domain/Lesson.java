@@ -72,4 +72,5 @@ public class Lesson {
     public String getCourseName() {
         return courseName;
     }
+    
 }

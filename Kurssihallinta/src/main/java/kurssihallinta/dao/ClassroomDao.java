@@ -22,7 +22,7 @@ import kurssihallinta.domain.Course;
  * Data Access Object used to manage database operations with Classroom objects.
  */
 public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
-    
+    private Connection db;
     /**
     * Adds the Classroom object given as a parameter to database.
     *
@@ -30,7 +30,6 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     */
     @Override
     public void add(Classroom classroom) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("INSERT INTO Classrooms (name) VALUES (?)");
         ps.setString(1, classroom.getName());
         ps.execute();
@@ -57,7 +56,6 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     */
     @Override
     public ObservableList search(String key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         String searchWord = "%" + key + "%";
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Classrooms WHERE name LIKE ?");
         ps.setString(1, searchWord);
@@ -83,7 +81,6 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     */
     @Override
     public int getId(String key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("SELECT id FROM Classrooms WHERE name = ?");
         ps.setString(1, key);
         ResultSet queryResults = ps.executeQuery();
@@ -102,7 +99,6 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     */
     @Override
     public Classroom get(int key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Classrooms WHERE id = ?");
         ps.setInt(1, key);
         ResultSet queryResults = ps.executeQuery();
@@ -119,7 +115,6 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     */
     @Override
     public ObservableList getAll() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement ps = db.createStatement();
 
         ResultSet queryResults = ps.executeQuery("SELECT name FROM Classrooms");
@@ -134,4 +129,8 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
         return classrooms;
     }
     
+    @Override
+    public void setConnection(Connection db) throws SQLException {
+        this.db = db;
+    }
 }

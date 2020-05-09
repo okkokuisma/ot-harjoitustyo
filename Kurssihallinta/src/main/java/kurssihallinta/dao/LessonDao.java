@@ -6,7 +6,6 @@
 package kurssihallinta.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,10 +25,13 @@ import kurssihallinta.domain.Lesson;
 public class LessonDao implements KurssihallintaDao<Lesson, String> {
     private KurssihallintaDao courses;
     private KurssihallintaDao classrooms;
+    private Connection db;
+    DatabaseUtil dbUtil;
     
-    public LessonDao() {
+    public LessonDao(DatabaseUtil dbUtil) {
         courses = new CourseDao();
         classrooms = new ClassroomDao();
+        this.dbUtil = dbUtil;
     }
     
     /**
@@ -39,8 +41,9 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     */
     @Override
     public void add(Lesson lesson) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+        courses.setConnection(dbUtil.getConnection());
         int courseId = courses.getId(lesson.getCourse().getName());
+        classrooms.setConnection(dbUtil.getConnection());
         int classroomId = classrooms.getId(lesson.getClassroom());
         PreparedStatement ps = db.prepareStatement("INSERT INTO Lessons (course_id,classroom_id,date,starttime,endtime) VALUES (?,?,?,?,?)");
         ps.setInt(1, courseId);
@@ -66,26 +69,24 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     /**
     * Retrieves the rows with a course_id that matches the course name given as a parameter.
     *
-    * @param    key  Course name
+    * @param    courseName  Course name
     * 
     * @return   ObservableList of Lesson objects
     */
     @Override
-    public ObservableList search(String key) throws SQLException {
-        int courseId = courses.getId(key);
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+    public ObservableList search(String courseName) throws SQLException {
+        courses.setConnection(dbUtil.getConnection());
+        int courseId = courses.getId(courseName);
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Lessons WHERE course_id = ?");
         ps.setInt(1, courseId);
         ResultSet queryResults = ps.executeQuery();
         ObservableList<Lesson> lessons = FXCollections.observableArrayList();
         while (queryResults.next()) {
-            LocalDate date = LocalDate.parse(queryResults.getString(4));
-            LocalTime start = LocalTime.parse(queryResults.getString(5));
-            LocalTime end = LocalTime.parse(queryResults.getString(6));
+            courses.setConnection(dbUtil.getConnection());
             Course course = (Course) courses.get(courseId);
+            classrooms.setConnection(dbUtil.getConnection());
             Classroom classroom = (Classroom) classrooms.get(queryResults.getInt(3));
-            Lesson lesson = new Lesson(course, classroom.getName(), date, start, end);
-            lessons.add(lesson);
+            lessons.add(new Lesson(course, classroom.getName(), LocalDate.parse(queryResults.getString(4)), LocalTime.parse(queryResults.getString(5)), LocalTime.parse(queryResults.getString(6))));
         }
         
         db.close();
@@ -104,7 +105,6 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
 
     @Override
     public ObservableList getAll() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement ps = db.createStatement();
         ResultSet queryResults = ps.executeQuery("SELECT * FROM Lessons");
         ObservableList<Lesson> lessons = FXCollections.observableArrayList();
@@ -112,7 +112,9 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
             LocalDate date = LocalDate.parse(queryResults.getString(4));
             LocalTime start = LocalTime.parse(queryResults.getString(5));
             LocalTime end = LocalTime.parse(queryResults.getString(6));
+            courses.setConnection(dbUtil.getConnection());
             Course course = (Course) courses.get(queryResults.getInt(2));
+            classrooms.setConnection(dbUtil.getConnection());
             Classroom classroom = (Classroom) classrooms.get(queryResults.getInt(3));
             Lesson lesson = new Lesson(course, classroom.getName(), date, start, end);
             lessons.add(lesson);
@@ -122,4 +124,8 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
         return lessons;
     }
     
+    @Override
+    public void setConnection(Connection db) throws SQLException {
+        this.db = db;
+    }
 }

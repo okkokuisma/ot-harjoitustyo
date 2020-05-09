@@ -1,6 +1,7 @@
 package kurssihallinta.dao;
 
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import javafx.collections.ObservableList;
 
@@ -21,4 +22,5 @@ public interface KurssihallintaDao<T, K> {
     int getId(String key) throws SQLException;
     T get(int key) throws SQLException;
     ObservableList getAll() throws SQLException;
+    void setConnection(Connection db) throws SQLException;
 }

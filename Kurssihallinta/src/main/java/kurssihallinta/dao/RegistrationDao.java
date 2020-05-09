@@ -10,12 +10,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import kurssihallinta.domain.Course;
-import kurssihallinta.domain.KurssihallintaService;
 import kurssihallinta.domain.Student;
 
 /**
@@ -23,24 +23,28 @@ import kurssihallinta.domain.Student;
  * Data Access Object used to manage database operations of registrations.
  */
 public class RegistrationDao {
-    private CourseDao courses;
-    private StudentDao students;
+    private Connection db;
     
-    public RegistrationDao() {
-        courses = new CourseDao();
-        students = new StudentDao();
-    }
-    
+//public void add(String courseName, String studentIdNum) throws SQLException {
+//        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+//        int courseId = courses.getId(courseName);
+//        int studentId = students.getId(studentIdNum);
+//        PreparedStatement ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
+//        ps.setInt(1, courseId);
+//        ps.setInt(2, studentId);
+//        ps.execute();
+//        
+//        db.close();
+//    }
+
     /**
     * Adds a new registration into Registrations table with course_id and student_id given as parameters.
     *
     * @param    courseId    The integer primary key of a course
     * @param    studentId   The integer primary key of a student
     */
-public void add(String courseName, String studentIdNum) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-        int courseId = courses.getId(courseName);
-        int studentId = students.getId(studentIdNum);
+    public void add(int courseId, int studentId) throws SQLException {
+//        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("INSERT INTO Registrations (course_id,student_id) VALUES (?,?)");
         ps.setInt(1, courseId);
         ps.setInt(2, studentId);
@@ -57,7 +61,7 @@ public void add(String courseName, String studentIdNum) throws SQLException {
     * @return   ObservableList of Course objects
     */
     public ObservableList searchRegistrationsByStudents(int studentId) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
+//        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Courses WHERE id IN (SELECT course_id FROM Registrations WHERE student_id = ?)");
         ps.setInt(1, studentId);
         ResultSet queryResults = ps.executeQuery();
@@ -82,7 +86,7 @@ public void add(String courseName, String studentIdNum) throws SQLException {
     * @return   ObservableList of Student objects
     */
     public ObservableList searchRegistrationsByCourses(int courseId) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");  
+//        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");  
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE id IN (SELECT student_id FROM Registrations WHERE course_id=?)");
         ps.setInt(1, courseId);
         ResultSet queryResults = ps.executeQuery();
@@ -95,5 +99,9 @@ public void add(String courseName, String studentIdNum) throws SQLException {
         
         db.close();
         return students;
+    }
+    
+    public void setConnection(Connection db) {
+        this.db = db;
     }
 }

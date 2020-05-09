@@ -60,11 +60,6 @@
                 <configuration>
                     <excludes>
                         <exclude>kurssihallinta/ui/*</exclude>
-                        <exclude>kurssihallinta/dao/CourseDao.class</exclude>
-                        <exclude>kurssihallinta/dao/StudentDao.class</exclude>
-                        <exclude>kurssihallinta/dao/RegistrationDao.class</exclude>
-                        <exclude>kurssihallinta/dao/ClassroomDao.class</exclude>
-                        <exclude>kurssihallinta/dao/LessonDao.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

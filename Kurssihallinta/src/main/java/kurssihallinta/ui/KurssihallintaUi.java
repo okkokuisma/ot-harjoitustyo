@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
@@ -41,7 +41,6 @@ import kurssihallinta.domain.Course;
 import kurssihallinta.domain.KurssihallintaService;
 import kurssihallinta.domain.Lesson;
 import kurssihallinta.domain.Student;
-import tornadofx.control.DateTimePicker;
 
 
 /**
@@ -55,43 +54,22 @@ public class KurssihallintaUi extends Application {
     private Scene lessonsScene;
     private TableView table;
     private TableViewController tableControl;
-    private Student selectedStudent;
-    private Course selectedCourse;
 
     
     @Override
     public void init() {
         service = new KurssihallintaService();
         tableControl = new TableViewController();
-        table = new TableView<>();
-        
-        try {
-            Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
-            Statement s = db.createStatement();
-            ResultSet queryResult = s.executeQuery("SELECT COUNT(*) FROM sqlite_master WHERE type='table'");
-            if (queryResult.getInt(1) > 0) {
-                db.close();
-                return;
-            }
-
-            s.execute("CREATE TABLE Courses (id INTEGER PRIMARY KEY, name TEXT UNIQUE, startdate TEXT, enddate TEXT, teacher TEXT, students INTEGER, max_students INTEGER)");
-            s.execute("CREATE TABLE Students (id INTEGER PRIMARY KEY, first_name TEXT, surname TEXT, id_number TEXT UNIQUE, address TEXT, zip TEXT, city TEXT, country TEXT, email TEXT)");
-            s.execute("CREATE TABLE Classrooms (id INTEGER PRIMARY KEY, name TEXT UNIQUE)");
-            s.execute("CREATE TABLE Registrations (id INTEGER PRIMARY KEY, course_id INTEGER, student_id INTEGER)");
-            s.execute("CREATE TABLE Lessons (id INTEGER PRIMARY KEY, course_id INTEGER, classroom_id INTEGER, date TEXT, starttime TEXT, endtime TEXT)");
-        } catch (SQLException ex) {
-            Logger.getLogger(KurssihallintaUi.class.getName()).log(Level.SEVERE, null, ex);
-        }      
+        table = new TableView<>();       
     }
 
     @Override
     public void start(Stage stage) { 
-        
         // Root panes
         BorderPane courseSceneCorePane = new BorderPane();
         BorderPane regSceneCorePane = new BorderPane();
         BorderPane lessonsSceneCorePane = new BorderPane();
-        
+        BorderPane lessonsSceneInnerPane = new BorderPane();
  
         // COURSE SCENE
         courseSceneCorePane.setPadding(new Insets(10, 10, 10, 10));
@@ -120,25 +98,29 @@ public class KurssihallintaUi extends Application {
             regSceneCorePane.setTop(navigationPanel);
             stage.setScene(regScene);
         });
-        
         lessonsButton.setOnMouseClicked((event) -> {
             Pane root = (Pane) stage.getScene().getRoot();
             root.getChildren().remove(navigationPanel);
             lessonsSceneCorePane.setTop(navigationPanel);
             stage.setScene(lessonsScene);
+            table = tableControl.getLessonTable(service.getLessons());
+            lessonsSceneInnerPane.setCenter(table);
         });
         
         courseSceneCorePane.setTop(navigationPanel);
         courseSceneCorePane.setCenter(courseSceneInnerPane);
         
         // Controls for individual course view
-        Button courseViewButton = new Button("Go to course page");
-        courseViewButton.setVisible(false);
+        Button indCourseViewButton = new Button("Go to course page");
+        indCourseViewButton.setVisible(false);
         
-        courseViewButton.setOnMouseClicked((event) -> {
+        indCourseViewButton.setOnMouseClicked((event) -> {
+            if (table.getSelectionModel().getSelectedItem() == null | !(table.getSelectionModel().getSelectedItem() instanceof Course)) {
+                return;
+            }
             Course course = (Course) table.getSelectionModel().getSelectedItem();
             courseSceneInnerPane.setCenter(getIndividualCourseView(course));
-            courseViewButton.setVisible(false);
+            indCourseViewButton.setVisible(false);
         });
         
         // Controls for searching courses
@@ -154,7 +136,7 @@ public class KurssihallintaUi extends Application {
         courseSearch.setOnKeyTyped((event) -> {          
             table = tableControl.getCourseTable(service.searchCourses(courseSearch.getText()));
             courseSceneInnerPane.setCenter(table);
-            courseViewButton.setVisible(true);
+            indCourseViewButton.setVisible(true);
         });      
         
         courseSceneUpperPanel.getChildren().add(courseSearch);
@@ -167,41 +149,45 @@ public class KurssihallintaUi extends Application {
         courseAddNode.setHgap(10);
         courseAddNode.setAlignment(Pos.CENTER);
         
-        TextField nameTextfield = new TextField();
-        courseAddNode.addRow(0, new Label("Name:"), nameTextfield);        
-        DatePicker startDate = new DatePicker();
-        courseAddNode.addRow(1, new Label("Starting day:"), startDate); 
-        DatePicker endDate = new DatePicker();
-        courseAddNode.addRow(2, new Label("Ending date:"), endDate);
-        TextField teacherTextfield = new TextField();
-        courseAddNode.addRow(3, new Label("Teacher:"), teacherTextfield);
+        TextField courseNameTextfield = new TextField();
+        courseAddNode.addRow(0, new Label("Name:"), courseNameTextfield);        
+        DatePicker courseStartDatePicker = new DatePicker();
+        courseAddNode.addRow(1, new Label("Start date:"), courseStartDatePicker); 
+        DatePicker courseEndDatePicker = new DatePicker();
+        courseAddNode.addRow(2, new Label("End date:"), courseEndDatePicker);
+        TextField courseTeacherTextfield = new TextField();
+        courseAddNode.addRow(3, new Label("Teacher:"), courseTeacherTextfield);
         Spinner<Integer> maxStudentsSpinner = new Spinner(0, 60, 0);
         courseAddNode.addRow(4, new Label("Maximum number of students:"), maxStudentsSpinner);
         
-        Button addButton = new Button("Add to database");
-        Label message = new Label();
-        courseAddNode.addRow(5, addButton, message);
-        
-        addButton.setOnMouseClicked((event) -> { 
-            Course course = new Course(nameTextfield.getText(), startDate.getValue(), endDate.getValue(), teacherTextfield.getText(), 0, maxStudentsSpinner.getValue());
+        Button addCourseButton = new Button("Add to database");
+        Label courseAddmessage = new Label();
+        courseAddNode.addRow(5, addCourseButton, courseAddmessage);
+        addCourseButton.setOnMouseClicked((event) -> { 
+            if (courseNameTextfield.getText().isBlank() | courseStartDatePicker.getValue() == null | courseEndDatePicker.getValue() == null | courseTeacherTextfield.getText().isBlank()) {
+                courseAddmessage.setText("Add required fields");
+                return;
+            }           
+            Course course = new Course(courseNameTextfield.getText(), courseStartDatePicker.getValue(), courseEndDatePicker.getValue(), courseTeacherTextfield.getText(), 0, maxStudentsSpinner.getValue());
             if (service.addCourse(course)) {
-                nameTextfield.clear();
-                teacherTextfield.clear();
-                message.setText("Added successfully to database");
+                courseNameTextfield.clear();
+                courseTeacherTextfield.clear();
+                courseAddmessage.setText("Added successfully to database");
             } else {
-                message.setText("Error: ");
+                courseAddmessage.setText("Error");
             }       
         });
         
         // Bottom navigation panel for controls
         HBox courseSceneControls = new HBox();
-        Button addCourseButton = new Button("Add a new course");
+        courseSceneControls.setSpacing(10);
+        Button courseAddViewButton = new Button("Add a new course");
         
-        addCourseButton.setOnMouseClicked((event) -> { 
+        courseAddViewButton.setOnMouseClicked((event) -> { 
             courseSceneInnerPane.setCenter(courseAddNode);
         });
         
-        courseSceneControls.getChildren().addAll(addCourseButton, courseViewButton);
+        courseSceneControls.getChildren().addAll(courseAddViewButton, indCourseViewButton);
         courseSceneInnerPane.setBottom(courseSceneControls);
         
         courseScene = new Scene(courseSceneCorePane, 900, 700);
@@ -214,13 +200,16 @@ public class KurssihallintaUi extends Application {
         regSceneInnerPane.setPadding(new Insets(0, 40, 20, 40));      
        
         // Controls for individual student view
-        Button studentViewButton = new Button("Go to student page");
-        studentViewButton.setVisible(false);
+        Button indStudentViewButton = new Button("Go to student page");
+        indStudentViewButton.setVisible(false);
         
-        studentViewButton.setOnMouseClicked((event) -> {
+        indStudentViewButton.setOnMouseClicked((event) -> {
+            if (table.getSelectionModel().getSelectedItem() == null | !(table.getSelectionModel().getSelectedItem() instanceof Student)) {
+                return;
+            }
             Student student = (Student) table.getSelectionModel().getSelectedItem();
             regSceneInnerPane.setCenter(getIndividualStudentView(student));
-            studentViewButton.setVisible(false);
+            indStudentViewButton.setVisible(false);
         });
         
         // Controls for searching students
@@ -236,7 +225,7 @@ public class KurssihallintaUi extends Application {
         studentSearch.setOnKeyTyped((event) -> {          
             table = tableControl.getStudentTable(service.searchStudents(studentSearch.getText()));
             regSceneInnerPane.setCenter(table);
-            studentViewButton.setVisible(true);
+            indStudentViewButton.setVisible(true);
         });      
         
         regSceneUpperPanel.getChildren().add(studentSearch);
@@ -266,11 +255,14 @@ public class KurssihallintaUi extends Application {
         studentAddView.addRow(7, new Label("Email:"), emailTextfield);
         
         Label regSceneMessage = new Label();
-        
         Button addStudentButton = new Button("Add to database");
         addStudentButton.setOnMouseClicked((event) -> {
+            if (firstNameTextfield.getText().isBlank() | surnameTextfield.getText().isBlank() | idTextfield.getText().isBlank()) {
+                regSceneMessage.setText("Fill required fields");
+                return;
+            }
             Student student = new Student(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
-            service.addStudent(firstNameTextfield.getText(), surnameTextfield.getText(), idTextfield.getText(), addressTextfield.getText(), zipTextfield.getText(), cityTextfield.getText(), countryTextfield.getText(), emailTextfield.getText());
+            service.addStudent(student);
             regSceneInnerPane.setCenter(addRegistration(student));
         });
 
@@ -282,91 +274,109 @@ public class KurssihallintaUi extends Application {
             regSceneInnerPane.setCenter(studentAddView);
         });
         
-        Button selectStudent = new Button("Select student");
-        selectStudent.setVisible(false);
-        selectStudent.setOnMouseClicked((event) -> {
+        Button selectStudentButton = new Button("Select student");
+        selectStudentButton.setVisible(false);
+        selectStudentButton.setOnMouseClicked((event) -> {
             if (table.getSelectionModel().getSelectedItem() instanceof Student) {
                 regSceneInnerPane.setCenter(addRegistration((Student) table.getSelectionModel().getSelectedItem()));
-                selectStudent.setVisible(false);
-                studentViewButton.setVisible(false);
+                selectStudentButton.setVisible(false);
+                indStudentViewButton.setVisible(false);
             }
         });
         
-        Button chooseFromDatabase = new Button("Choose a student from database");
-        chooseFromDatabase.setOnMouseClicked((event) -> {
+        Button chooseFromDatabaseButton = new Button("Choose a student from database");
+        chooseFromDatabaseButton.setOnMouseClicked((event) -> {
             regSceneInnerPane.setCenter(new Label("Search for students."));
-            selectStudent.setVisible(true);
+            selectStudentButton.setVisible(true);
         });
         
         // Selection view during registration
         GridPane optionView = new GridPane();
         optionView.setVgap(10);
         optionView.setAlignment(Pos.CENTER);
-        optionView.addColumn(0, chooseFromDatabase, new Label("or"), addStudent);
+        optionView.addColumn(0, chooseFromDatabaseButton, new Label("or"), addStudent);
         
         // Bottom navigation panel for controls
-        HBox regSceneControls = new HBox();        
+        HBox regSceneControls = new HBox();
+        regSceneControls.setSpacing(10);
         Button addRegButton = new Button("Add a new registration");
         
         addRegButton.setOnMouseClicked((event) -> { 
             table.setItems(null);
             regSceneInnerPane.setCenter(optionView);
-            studentViewButton.setVisible(false);
+            indStudentViewButton.setVisible(false);
         });
         
-        regSceneControls.getChildren().addAll(addRegButton, selectStudent, studentViewButton);
+        regSceneControls.getChildren().addAll(addRegButton, indStudentViewButton, selectStudentButton);
         regSceneInnerPane.setBottom(regSceneControls);
         
         regScene = new Scene(regSceneCorePane, 900, 700);      
         
         // Lesson scene
-        BorderPane lessonsSceneInnerPane = new BorderPane();
+        
         lessonsSceneCorePane.setPadding(new Insets(10, 10, 10, 10));
         lessonsSceneInnerPane.setPadding(new Insets(10, 40, 20, 40));   
         GridPane lessonsSceneControls = new GridPane();
         lessonsSceneControls.setHgap(10);
         lessonsSceneControls.setVgap(10);
         
-        Button addClassroom = new Button("Add a new classroom");
+        Button addClassroomButton = new Button("Add a new classroom");
         Button saveClassroom = new Button("Save");
+        Button filterLessons = new Button("Filter lessons");
         TextField classroomTextField = new TextField();
         ChoiceBox<String> selectClassroom = new ChoiceBox();
         DatePicker selectDate = new DatePicker();
         selectClassroom.getItems().addAll(service.getClassrooms());
-        lessonsSceneControls.addRow(0, addClassroom);
-        lessonsSceneControls.addRow(1, selectClassroom, selectDate);
-        
+        lessonsSceneControls.addRow(0, addClassroomButton);
+        lessonsSceneControls.addRow(1, selectClassroom, selectDate, filterLessons);
         
         saveClassroom.setOnMouseClicked((event) -> {
             if (!classroomTextField.getText().isBlank()) {
                 Classroom classroom = new Classroom(classroomTextField.getText());
-                if (!service.addClassroom(classroom)) {
-                    System.out.println("virhe");
-                }             
+                service.addClassroom(classroom);            
             }
             
             lessonsSceneControls.getChildren().removeAll(classroomTextField, saveClassroom);
-            lessonsSceneControls.addRow(0, addClassroom);
+            lessonsSceneControls.addRow(0, addClassroomButton);
         });
         
-        addClassroom.setOnMouseClicked((event) -> {
-            lessonsSceneControls.getChildren().remove(addClassroom);
+        selectClassroom.setOnMouseClicked((event) -> {
+            selectClassroom.getItems().clear();
+            selectClassroom.getItems().addAll(service.getClassrooms());
+        });
+        
+        addClassroomButton.setOnMouseClicked((event) -> {
+            lessonsSceneControls.getChildren().remove(addClassroomButton);
             lessonsSceneControls.addRow(0, classroomTextField, saveClassroom);           
         });
         
+        filterLessons.setOnMouseClicked((event) -> { 
+            if (selectClassroom.getValue() != null & selectDate.getValue() != null) {
+                lessonsSceneInnerPane.getChildren().remove(table);
+                table = tableControl.getLessonTable(service.getLessonsFilteredByClassroomAndDate(selectClassroom.getValue(), selectDate.getValue()));
+                lessonsSceneInnerPane.setCenter(table);
+            } else if (selectDate.getValue() != null) {
+                lessonsSceneInnerPane.getChildren().remove(table);
+                table = tableControl.getLessonTable(service.getLessonsFilteredByDate(selectDate.getValue()));
+                lessonsSceneInnerPane.setCenter(table);
+            } else if (selectClassroom.getValue() != null) {
+                lessonsSceneInnerPane.getChildren().remove(table);
+                table = tableControl.getLessonTable(service.getLessonsFilteredByClassroom(selectClassroom.getValue()));
+                lessonsSceneInnerPane.setCenter(table);
+            }
+        });
+        
         lessonsSceneCorePane.setCenter(lessonsSceneInnerPane);
-        lessonsSceneInnerPane.setCenter(tableControl.getLessonTable(service.getLessons()));
+        
         lessonsSceneInnerPane.setTop(lessonsSceneControls);
         lessonsScene = new Scene(lessonsSceneCorePane, 900, 700);
         
         // Initial settings
         stage.setScene(courseScene);
-
         stage.setMinWidth(900);
         stage.setMinHeight(700);
         stage.setTitle("Kurssihallinta");
-        stage.show();
-       
+        stage.show(); 
     }
     
     private Node addRegistration(Student student) {
@@ -381,16 +391,20 @@ public class KurssihallintaUi extends Application {
             searchField.clear(); 
         });
         
-        searchField.setOnKeyTyped((event) -> {          
+        searchField.setOnKeyTyped((event) -> {
             table = tableControl.getCourseTable(service.searchCourses(searchField.getText()));
             regPane.setCenter(table);
         });
         
         HBox regPaneControls = new HBox();
+        regPaneControls.setSpacing(10);
         regPaneControls.getChildren().addAll(selectCourse, message);
         regPane.setBottom(regPaneControls);
         
         selectCourse.setOnMouseClicked((event) -> { 
+            if (table.getSelectionModel().getSelectedItem() == null | !(table.getSelectionModel().getSelectedItem() instanceof Course)) {
+                return;
+            }
             Course course = (Course) table.getSelectionModel().getSelectedItem();
             if (course.getStudents() >= course.getMaxStudents()) {
                 message.setText("Selected course is full.");
@@ -452,6 +466,9 @@ public class KurssihallintaUi extends Application {
         
         Button saveButton = new Button("Save changes");
         saveButton.setOnMouseClicked((event) -> {
+            if (firstNameEdit.getText().isBlank() | surnameEdit.getText().isBlank()) {
+                return;
+            }
             Student update = new Student(firstNameEdit.getText(), surnameEdit.getText(), student.getId(), addressEdit.getText(), cityEdit.getText(), zipEdit.getText(), countryEdit.getText(), emailEdit.getText());
             service.updateStudent(update);
             
@@ -558,45 +575,62 @@ public class KurssihallintaUi extends Application {
         SpinnerValueFactory spinnerValues = new IntegerSpinnerValueFactory(0, 50, course.getMaxStudents());
         
         // Controls for adding lessons
-        DateTimePicker startTimepicker = new DateTimePicker();
-        DateTimePicker endTimepicker = new DateTimePicker();  
-        endTimepicker.setOnMouseClicked((event) -> { 
-            endTimepicker.setValue(startTimepicker.getValue());
-        });
+        Label errorMessage = new Label("Fill required fields");
+        errorMessage.setVisible(false);
+        Spinner<Integer> startHoursSpinner = new Spinner(5, 23, 12);
+        Spinner<Integer> startMinsSpinner = new Spinner(0, 45, 0, 15);
+        Spinner<Integer> endHoursSpinner = new Spinner(5, 23, 12);
+        Spinner<Integer> endMinsSpinner = new Spinner(0, 45, 0, 15);
+        DatePicker lessonDatePicker = new DatePicker();
+        lessonDatePicker.setMaxWidth(100);
+        startHoursSpinner.setMaxWidth(100);
+        startMinsSpinner.setMaxWidth(100);
+        endHoursSpinner.setMaxWidth(100);
+        endMinsSpinner.setMaxWidth(100);
         
         ChoiceBox<String> classrooms = new ChoiceBox();
         classrooms.getItems().addAll(service.getClassrooms());
         
-        
-        Button addLesson = new Button("Add lesson");
-        addLesson.setOnMouseClicked((event) -> { 
-            Lesson lesson = new Lesson(course, classrooms.getValue(), startTimepicker.getValue(), startTimepicker.dateTimeValueProperty().getValue().toLocalTime(), endTimepicker.dateTimeValueProperty().getValue().toLocalTime());
+        Button addLessonButton = new Button("Add lesson");
+        addLessonButton.setOnMouseClicked((event) -> {
+            LocalTime startTime = LocalTime.of(startHoursSpinner.getValue(), startMinsSpinner.getValue());
+            LocalTime endTime = LocalTime.of(endHoursSpinner.getValue(), endMinsSpinner.getValue());
+            if (classrooms.getValue() == null | lessonDatePicker.getValue() == null | startTime == null | endTime == null) {
+                errorMessage.setVisible(true);
+                return;
+            }
+            Lesson lesson = new Lesson(course, classrooms.getValue(), lessonDatePicker.getValue(), startTime, endTime);
             service.addLesson(lesson);
             table.getItems().add(lesson);
             table.refresh();
+            errorMessage.setVisible(false);
         });
         
-        lessonInfo.addRow(1, addLesson);
-        lessonInfo.addRow(2, new Label("Classroom:"), classrooms);
-        lessonInfo.addRow(3, new Label("Starts at:"), startTimepicker);
-        lessonInfo.addRow(4, new Label("Ends at:"), endTimepicker);
-        Scene testi = new Scene(lessonPane);
-        Stage ikkuna = new Stage();
-        ikkuna.initModality(Modality.WINDOW_MODAL);
+        lessonInfo.addRow(1, new Label("Classroom:"), classrooms);
+        lessonInfo.addRow(2, new Label("Date:"), lessonDatePicker);
+        lessonInfo.addRow(3, new Label("Starts at:"), startHoursSpinner, new Label(":"), startMinsSpinner);
+        lessonInfo.addRow(4, new Label("Ends at:"), endHoursSpinner, new Label(":"), endMinsSpinner);
+        lessonInfo.addRow(5, addLessonButton, errorMessage);
+        lessonInfo.setVgap(5);
+        lessonInfo.setHgap(5);
+        lessonInfo.setPadding(new Insets(0, 0, 10, 0));
+        Scene lessonScene = new Scene(lessonPane);
+        Stage lessonEditWindow = new Stage();
+        lessonEditWindow.initModality(Modality.WINDOW_MODAL);
         
         lessonButton.setOnMouseClicked((event) -> {
             table = tableControl.getLessonTable(service.searchLessonsByCourseName(course.getName()));
             lessonPane.setCenter(table);
             lessonPane.setTop(lessonInfo);
-            ikkuna.setOnHidden((e) -> { 
-               
-           });
-            ikkuna.setScene(testi);
-            ikkuna.show();
+            lessonEditWindow.setScene(lessonScene);
+            lessonEditWindow.show();
         });
         
         Button saveButton = new Button("Save changes");
         saveButton.setOnMouseClicked((event) -> {
+            if (startDateEdit.getValue() == null | endDateEdit.getValue() == null | teacherEdit.getText().isBlank()) {
+                return;
+            }
             Course update = new Course(course.getName(), startDateEdit.getValue(), endDateEdit.getValue(), teacherEdit.getText(), course.getStudents(), maxStudentsEdit.getValue());
             service.updateCourse(update);
             

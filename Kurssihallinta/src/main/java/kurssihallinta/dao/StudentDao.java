@@ -22,7 +22,7 @@ import kurssihallinta.domain.Student;
  * Data Access Object used to manage database operations with Student objects.
  */
 public class StudentDao implements KurssihallintaDao<Student, String> {
-
+    private Connection db;
     /**
     * Adds the Student object given as a parameter to database.
     *
@@ -30,7 +30,6 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     */
     @Override
     public void add(Student student) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("INSERT INTO Students (first_name,surname,id_number,address,zip,city,country,email) VALUES (?,?,?,?,?,?,?,?)");
         ps.setString(1, student.getFirstName());
         ps.setString(2, student.getSurname());
@@ -51,7 +50,6 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     */
     @Override
     public void update(Student student) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("UPDATE Students SET "
                 + "first_name = ?, "
                 + "surname = ?, "
@@ -81,7 +79,6 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     */
     @Override
     public ObservableList search(String key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         String searchWord = "%" + key + "%";
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE first_name LIKE ? OR surname LIKE ?");
         ps.setString(1, searchWord);
@@ -107,25 +104,14 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     * @return   Integer primary key
     */
     @Override
-    public int getId(String key) {
-        Connection db = null;
-        try {
-            db = DriverManager.getConnection("jdbc:sqlite:database.db");
-            PreparedStatement ps = db.prepareStatement("SELECT id FROM Students WHERE id_number = ?");
-            ps.setString(1, key);
-            ResultSet queryResults = ps.executeQuery();
-            int studentId = queryResults.getInt(1);
-            db.close();
-            
-            return studentId;
-        } catch (SQLException ex) {
-            try {
-                db.close();
-            } catch (SQLException ex1) {
-                Logger.getLogger(StudentDao.class.getName()).log(Level.SEVERE, null, ex1);
-            }
-        }
-        return -1;
+    public int getId(String key) throws SQLException {
+        PreparedStatement ps = db.prepareStatement("SELECT id FROM Students WHERE id_number = ?");
+        ps.setString(1, key);
+        ResultSet queryResults = ps.executeQuery();
+        int studentId = queryResults.getInt(1);
+        db.close();
+
+        return studentId;
     }
     
     /**
@@ -137,7 +123,6 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     */
     @Override
     public Student get(int key) throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Students WHERE id = ?");
         ps.setInt(1, key);
         ResultSet queryResults = ps.executeQuery();
@@ -154,7 +139,6 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     */
     @Override
     public ObservableList getAll() throws SQLException {
-        Connection db = DriverManager.getConnection("jdbc:sqlite:database.db");
         Statement ps = db.createStatement();
 
         ResultSet queryResults = ps.executeQuery("SELECT * FROM Students");
@@ -171,4 +155,8 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
         return students;
     }
     
+    @Override
+    public void setConnection(Connection db) throws SQLException {
+        this.db = db;
+    }
 }
