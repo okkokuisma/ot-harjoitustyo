@@ -20,6 +20,7 @@ import kurssihallinta.domain.Classroom;
  */
 public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     private Connection db;
+    
     /**
     * Adds the Classroom object given as a parameter to database.
     *
@@ -36,9 +37,9 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
     }
     
     /**
-    * Changes the data in the Classrooms table of a Classroom object given as a parameter.
+    * Updates the data of the corresponding row in Classrooms table (unsupported).
     *
-    * @param    classroom  Classroom object with the data to be modified
+    * @param    classroom  Classroom object with the modified data
     * @throws java.sql.SQLException
     */
     @Override
@@ -60,8 +61,7 @@ public class ClassroomDao implements KurssihallintaDao<Classroom, String> {
         PreparedStatement ps = db.prepareStatement("SELECT * FROM Classrooms WHERE name LIKE ?");
         ps.setString(1, searchWord);
         ResultSet queryResults = ps.executeQuery();
-        
-        // CREATE A LIST OBJECT FROM QUERY RESULTS
+
         ObservableList<Classroom> classrooms = FXCollections.observableArrayList();
         while (queryResults.next()) {
             Classroom classroom = new Classroom(queryResults.getString(1));

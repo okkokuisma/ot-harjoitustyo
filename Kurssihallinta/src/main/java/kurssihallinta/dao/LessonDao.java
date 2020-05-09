@@ -58,9 +58,9 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
     }
     
     /**
-    * Changes the data in the database of a Lesson object given as a parameter.
+    * Updates the data of the corresponding row in Lessons table (unsupported).
     *
-    * @param    lesson  Lesson object with the data to be modified.
+    * @param    lesson  Lesson object with the modified data.
     */
     @Override
     public void update(Lesson lesson) throws SQLException {
@@ -95,11 +95,19 @@ public class LessonDao implements KurssihallintaDao<Lesson, String> {
         return lessons;
     }
     
+    /**
+    * Unsuppported.
+    * 
+    */
     @Override
     public int getId(String key) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    /**
+    * Unsuppported.
+    * 
+    */
     @Override
     public Lesson get(int key) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

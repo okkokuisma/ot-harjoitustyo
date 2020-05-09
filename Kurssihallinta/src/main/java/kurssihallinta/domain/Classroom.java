@@ -5,16 +5,17 @@
  */
 package kurssihallinta.domain;
 
-/**
- *
- * @author ogkuisma
- */
 public class Classroom {
     private String name;
     
     public Classroom(){
     }
-
+    
+    /**
+    * Creates a Classroom object with the given name value.
+    * 
+     * @param name Classroom name
+    */
     public Classroom(String name) {
         this.name = name;
     }
@@ -25,7 +26,5 @@ public class Classroom {
 
     public void setName(String name) {
         this.name = name;
-    }
-    
-    
+    }  
 }

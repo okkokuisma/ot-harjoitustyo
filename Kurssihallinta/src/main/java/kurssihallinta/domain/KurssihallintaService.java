@@ -41,7 +41,7 @@ public class KurssihallintaService {
     /**
     *
     * Setter method used primarily to configure tests. 
-    * @param dbUtil DatabaseUtil object which is connected to test database
+    * @param dbUtil DatabaseUtil object which is connected to a test database
     */
     public void setDbUtil(DatabaseUtil dbUtil) {
         this.dbUtil = dbUtil;

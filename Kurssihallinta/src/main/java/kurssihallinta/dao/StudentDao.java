@@ -42,9 +42,9 @@ public class StudentDao implements KurssihallintaDao<Student, String> {
     }
     
     /**
-    * Changes the data in the Students table of a Student object given as a parameter.
+    * Updates the data of the corresponding row in Students table.
     *
-    * @param    student  Student object with the data to be modified
+    * @param    student  Student object with the modified table
     * @throws java.sql.SQLException
     */
     @Override

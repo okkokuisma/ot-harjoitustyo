@@ -21,6 +21,7 @@ import kurssihallinta.domain.Course;
  */
 public class CourseDao implements KurssihallintaDao<Course, String> {
     private Connection db;
+    
     /**
     * Adds the Course object given as a parameter to database.
     *
@@ -42,9 +43,9 @@ public class CourseDao implements KurssihallintaDao<Course, String> {
     }
     
     /**
-    * Changes the data in the database of a Course object given as a parameter.
+    * Updates the data of the corresponding row in Courses table.
     *
-    * @param    course  Course object with the data to be modified
+    * @param    course  Course object with the modified data
     * @throws java.sql.SQLException
     */
     @Override

@@ -5,16 +5,9 @@
  */
 package kurssihallinta.ui;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -45,7 +38,7 @@ import kurssihallinta.domain.Student;
 
 /**
  *
- * @author okkokuisma
+ * The graphic UI.
  */
 public class KurssihallintaUi extends Application {
     private KurssihallintaService service;
@@ -265,7 +258,7 @@ public class KurssihallintaUi extends Application {
             service.addStudent(student);
             regSceneInnerPane.setCenter(addRegistration(student));
         });
-
+        
         studentAddView.addRow(8, addStudentButton, regSceneMessage);
         
         // Controls for adding registrations
@@ -379,6 +372,11 @@ public class KurssihallintaUi extends Application {
         stage.show(); 
     }
     
+    /**
+    * Creates a registration view based on a given Student object.
+    * @param student A Student object chosen by the user
+    * @return Node object of the registration view
+    */
     private Node addRegistration(Student student) {
         BorderPane regPane = new BorderPane();
         regPane.setPadding(new Insets(70, 0, 15, 0));
@@ -422,6 +420,11 @@ public class KurssihallintaUi extends Application {
         return regPane;
     }
     
+    /**
+    * Creates an individual student view based on a given Student object.
+    * @param student A Student object chosen by the user
+    * @return Node object of the individual student view
+    */
     private Node getIndividualStudentView(Student student) {
         BorderPane indStudent = new BorderPane();
         GridPane studentInfo = new GridPane();
@@ -538,6 +541,11 @@ public class KurssihallintaUi extends Application {
         return indStudent;
     }
     
+    /**
+    * Creates an individual course view based on a given Course object.
+    * @param course A Course object chosen by the user
+    * @return Node object of the individual course view
+    */
     private Node getIndividualCourseView(Course course) {
         BorderPane indCourse = new BorderPane();
         GridPane courseInfo = new GridPane();

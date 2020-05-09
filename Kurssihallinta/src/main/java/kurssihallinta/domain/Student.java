@@ -21,7 +21,19 @@ public class Student {
     
     public Student() {
     }
-
+    
+    /**
+    * Creates a Student object with the given contact information.
+    * 
+     * @param firstName First name
+     * @param surname Surname
+     * @param id Personal ID number
+     * @param address Address
+     * @param zipCode ZIP code
+     * @param city City of residence
+     * @param country Country of residence
+     * @param email Email address
+    */
     public Student(String firstName, String surname, String id, String address, String zipCode, String city, String country, String email) {
         this.firstName = firstName;
         this.surname = surname;

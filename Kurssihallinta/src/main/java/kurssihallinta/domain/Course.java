@@ -8,10 +8,6 @@ package kurssihallinta.domain;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- *
- * @author okkokuisma
- */
 public class Course {
     private String name;
     private LocalDate startDate;
@@ -22,7 +18,17 @@ public class Course {
     
     public Course() {       
     }
-
+    
+    /**
+    * Creates a Course object with the given name, date, teacher and student values.
+    * 
+     * @param name Course name
+     * @param startDate Starting date
+     * @param endDate End date
+     * @param teacher Teacher's name
+     * @param students Number of registered students
+     * @param maxStudents Maximum number of registered students
+    */
     public Course(String name, LocalDate startDate, LocalDate endDate, String teacher, int students, int maxStudents) {
         this.students = students;
         this.name = name;

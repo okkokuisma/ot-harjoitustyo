@@ -19,7 +19,16 @@ public class Lesson {
     private LocalTime startTime;
     private LocalTime endTime;
     private String courseName;
-
+    
+    /**
+    * Creates a Lesson object with the given name, classroom, date and time values.
+    * 
+     * @param course Course
+     * @param classroom Classroom name
+     * @param date Date
+     * @param startTime Starting time
+     * @param endTime Ending time
+    */
     public Lesson(Course course, String classroom, LocalDate date, LocalTime startTime, LocalTime endTime) {
         this.course = course;
         this.classroom = classroom;

@@ -27,6 +27,11 @@ public class DatabaseUtil {
     Connection db;
     String databasePath;
     
+    /**
+    *
+    * If testMode is true the Connection is set to a test database, if testMode is false the Connection is set to database in a file path determined by the config.properties file.
+    * @param testMode true for test classes, else false 
+    */
     public DatabaseUtil(boolean testMode) {
         if (testMode) {
             databasePath = "jdbc:sqlite:test.db";
