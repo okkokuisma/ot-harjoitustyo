@@ -10,7 +10,35 @@ Sovelluksen avulla opiston tai koulun on mahdollista pitää kirjaa sen järjest
 
 [Käyttöohje](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kayttoohje.md)
 
+[Tesatusdokumentti](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/testausdokumentti.md)
+
 ## Releaset
 [Viikko 5](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/viikko5)
 
 [Viikko 6](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/viikko6)
+
+[Loppupalautus](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/loppupalautus)
+
+## Komentorivitoiminnot
+
+Sovelluksesta generoidaan suoritettava jar-tiedosto komennolla
+
+`mvn package`
+
+Jar-tiedosto ajetaan komennolla
+
+`java -jar Kurssihallinta.jar`
+
+Testit kattavuusraportilla ajetaan komennolla
+
+`mvn test jacoco:report`
+
+Sovelluksen JavaDoc generoidaan komennolla
+
+`mvn javadoc:javadoc`
+
+Chechstyle-tarkistus ajetaan komennolla
+
+`mvn jxr:jxr checkstyle:checkstyle`
+
+
