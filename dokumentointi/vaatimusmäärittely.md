@@ -8,12 +8,13 @@ Alkuvaiheessa sovelluksella on yksi käyttäjärooli, pääkäyttäjä, jolla on
 
 ## Perusversion tarjoama toiminnallisuus
 * Uusien kurssien lisääminen
-	* Kurssiaikataulujen luominen, vastuuopettajan lisääminen (kurssiaikataulujen luominen tehty)
 * Uusien opiskelijoiden lisääminen
-	* Opiskelijoiden yhteystietojen ja kurssi-ilmoittautumisten hallinnointi (opiskelijoiden tietojen hallinnointi tehty)
+* Kurssi- ja opiskelijatietojen muokkaaminen
 * Hakutoiminnot kursseille ja opiskelijoille
-* Luokkahuoneiden ja oppituntien lisääminen (tehty)
+* Luokkahuoneiden ja oppituntien lisääminen
+* Oppituntien selaaminen luokkahuoneittain ja päivämäärän mukaan
 
 ## Jatkokehitysideoita
+* Mahdollisuus poistaa tietokantaan lisättyjä kursseja, opiskelijoita, luokkahuoneita tai oppitunteja
 * Opettajille käyttäjärooli, jolla oikeudet tarkastella omien kurssien luentojen aikatauluja ja omille kursseilla ilmoittautuneita opiskelijoita
 * Kalenterinäkymä, josta näkyy tiettynä päivänä tai viikkona järjetettävä opetus
