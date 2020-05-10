@@ -9,4 +9,7 @@ Päivä | Tunteja | Mitä tein
 21.4. | 2 | sekvenssikaavio, release
 27.4. | 8 | oppituntien lisäystoiminnallisuus
 28.4. | 8 | dokumentointia, bugien kiroamista
-yht | 50 |
+8.5. | 4 | bugien poistoa, DatabaseUtil-luokka
+9.5. | 8 | dokumentointia
+10.5. | 3 | viimeiset dokumentoinnit, repositorion siistimistä
+yht | 65 |
