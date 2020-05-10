@@ -1,18 +1,18 @@
 # Käyttöohje
-Lataa jar-tiedosto osoitteesta (https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/viikko6)
+[Lataa sovelluksen jar-tiedosto ja konfigurointitiedosto](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/loppupalautus)
 
 ## Sovelluksen konfigurointi
 Sovellus olettaa, että sen juurikansiossa on käynnistyshetkellä tiedosto "config.properties", joka määrittelee käytettävän tietokantatiedoston nimen. Tämän konfigurointitiedoston avulla käyttäjän on mahdollista vaihtaa käytettävää tietokantatiedostoa. Jos tietokantatiedostoa ei ole olemassa käynnistyshetkellä, sovellus luo sen automaattisesti.
 
-Jotta sovellus toimii oikein, on konfigurointitiedoston oltava muotoa
+Jotta sovellus toimii oikein, tulee konfigurointitiedoston sisältää vastaava rivi:
 
 `dbFile=*tiedostoNimi*`
 
-Esimerkiksi
+Esimerkiksi rivin
 
 `dbFile=esimerkki`
 
-luo kansioon esimerkki.db-tiedoston, kun sovellus käynnistetään.
+myötä kansioon luodaan "esimerkki.db"-tiedosto, kun sovellus käynnistetään.
 
 ## Sovelluksen käynnistäminen
 Sovellus käynnistetään komennolla
@@ -42,7 +42,7 @@ Jotta voit lisätä oppitunteja, tietokannassa tulee olla lisättynä luokkahuon
 
 ![Kurssinakyma](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/kurssinakyma.png)
 
-Paina "Edit lessons" -painiketta. Voit nyt valita luokkahuoneen ja lisätä kurssin alkamis- ja loppumisajankohdat:
+Paina "Edit lessons" -painiketta. Voit nyt valita luokkahuoneen ja lisätä oppitunnin alkamis- ja loppumisajankohdat:
 
 ![Valintanakyma](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/oppituntinakyma.png)
 
