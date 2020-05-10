@@ -12,4 +12,4 @@ Testien rivikattavuus on 83% ja haaraumakattavuus on 94%, kun sovelluksen käytt
 ![testikattavuus](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/testikattavuus.png)
 
 ## Järjestelmätestaus
-Sovelluksen toimintaa on testattu myös runsaasti manuaalisesti erilaisissa skenaatrioissa ja erilaisin syöttein. Käyttöjärjestelmä on jätetty JUnit-testeissä täysin huomioitta ja sen testaus on perustunut manuaaliseen testaamiseen. Sovelluksen toimintaa ja konfigurointia on testattu myös eri tietokoneilla ja käyttöjärjestelmillä.
+Sovelluksen toimintaa on testattu myös runsaasti manuaalisesti erilaisissa skenaarioissa ja erilaisin syöttein. Käyttöjärjestelmä on jätetty JUnit-testeissä täysin huomioitta ja sen testaus on perustunut manuaaliseen testaamiseen. Sovelluksen toimintaa ja konfigurointia on testattu myös eri tietokoneilla ja käyttöjärjestelmillä.
