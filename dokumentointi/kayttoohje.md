@@ -2,7 +2,7 @@
 [Lataa sovelluksen jar-tiedosto ja konfigurointitiedosto](https://github.com/okkokuisma/ot-harjoitustyo/releases/tag/loppupalautus)
 
 ## Sovelluksen konfigurointi
-Sovellus olettaa, että sen juurikansiossa on käynnistyshetkellä tiedosto "config.properties", joka määrittelee käytettävän tietokantatiedoston nimen. Tämän konfigurointitiedoston avulla käyttäjän on mahdollista vaihtaa käytettävää tietokantatiedostoa. Jos tietokantatiedostoa ei ole olemassa käynnistyshetkellä, sovellus luo sen automaattisesti.
+Sovellus olettaa, että sen kanssa samassa kansiossa on käynnistyshetkellä tiedosto "config.properties", joka määrittelee käytettävän tietokantatiedoston nimen. Tämän konfigurointitiedoston avulla käyttäjän on mahdollista vaihtaa käytettävää tietokantatiedostoa. Jos tietokantatiedostoa ei ole olemassa käynnistyshetkellä, sovellus luo sen automaattisesti.
 
 Jotta sovellus toimii oikein, tulee konfigurointitiedoston sisältää vastaava rivi:
 
@@ -15,7 +15,7 @@ Esimerkiksi rivin
 myötä kansioon luodaan "esimerkki.db"-tiedosto, kun sovellus käynnistetään.
 
 ## Sovelluksen käynnistäminen
-Sovellus käynnistetään komennolla
+Navigoi terminaalissa kansioon, jossa "Kurssihallinta.jar"- ja "config.properties"-tiedostot sijaitsevat. Sovellus käynnistetään komennolla
 
 `java -jar Kurssihallinta.jar`
 
