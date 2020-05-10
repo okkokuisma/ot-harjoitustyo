@@ -21,6 +21,16 @@ KurssihallintaService saa oliomuuttujina kurssihallinta.dao-pakkauksen luokat Co
 
 ![Pakkauskaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/pakkauskaavio.png)
 
+Sovelluslogiikka parin päätoiminnallisuuden takana sekvenssikaavioin:
+
+![Sekvenssikaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/sekvenssikaavio_kurssilisays.png)
+
+Kuvassa esitettynä uuden kurssin lisääminen tietokantaan. Alussa käyttäjä navigoi käyttöliittymässä lisäysnäkymään. Kurssitietojen kirjaamisen ja lisäyspainikkeen painamisen myötä käyttöliittymä luo uuden Course-olion ja kutsuu KurssihallintaServicen addCourse-metodia uusi Course-olio parametrina. KurssihallintaService taas kutsuu CourseDao:n add-metodia ja palauttaa käyttöliittymälle true tai false sen mukaan, onko lisäys tietokantaan onnistunut. Käyttöliittymä välittää tiedon käyttäjälle.
+
+![Sekvenssikaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/registrationsekvenssi.png)
+
+Tässä esitettynä uuden kurssi-ilmoittautumisen lisääminen tietokantaan tapauksessa, jossa ilmoittautumisen yhteydessä lisätään myös uusi opiskelija tietokantaan. Opiskelijan lisääminen tapahtuu samaan tapaan kuin edellä esitetty kurssin lisääminen. Kun opiskelija on lisätty, käyttöliittymä kutsuu omaa metodiaan addRegistrationView parametrina juuri luotu Student-olio. Tässä kurssi-ilmoittautumisten lisäysnäkymässä käyttäjä ensin hakee hakupalkkia hyödyntämällä kursseja tietokannasta, mikä tapahtuu kutsumalla KurssihallintaServicen searchCourses- ja CourseDao:n search-metodeita. Käyttäjälle palautetaan lista hakusanaa vastanneita kursseja. Käyttäjän valittua listasta haluamansa kurssin käyttöliittymä kutsuu KurssihallintaServicen addRegistration-metodia. Metodissa haetaan ensin kyseisen kurssin ja opiskelijan rivi-id:t CourseDao:n ja StudentDao:n getId-metodeilla, minkä jälkeen lopulta kutsutaan RegistrationDao:n add-metodia. Palautetaan true, jos lisäys on onnistunut.
+
 ## Tietojen pysyväistallennus
 Tietojen pysyväistallennus on pyritty toteuttamaan Data Access Object -mallia noudattaen. Jokaiselle loogisen datamallin luokalle on olemassa oma DAO-luokkansa ja taulunsa tietokannassa. Näiden lisäksi sovelluksessa on myös tietokannan Registrations-taulun, eli kurssi-ilmoittautumisten, lukemisesta ja muokkaamisesta vastaava luokka RegistrationDao.
 
@@ -32,10 +42,5 @@ Sovellus tarvitsee toimiakseen tietokantatiedoston, jonka se luo automaattisesti
 Sovellus käyttää tietokantajärjestelmänä SQLiteä. Tietokanta muodostuu viidestä taulusta, Courses-, Students-, Classrooms-, Lessons- ja Registrations-tauluista, joista tauluissa Lessons ja Registrations viitataan toisiin tauluihin niiden id-avainten avulla. Tiedon eheyttä on pyritty ylläpitämään joillain yksittäisillä UNIQUE-ehdoilla.
 
 Tietokannan SQL-skeema on vastaava:
-`CREATE TABLE Courses (id INTEGER PRIMARY KEY, name TEXT UNIQUE, startdate TEXT, enddate TEXT, teacher TEXT, students INTEGER, max_students INTEGER);
-CREATE TABLE Students (id INTEGER PRIMARY KEY, first_name TEXT, surname TEXT, id_number TEXT UNIQUE, address TEXT, zip TEXT, city TEXT, country TEXT, email TEXT);
-CREATE TABLE Classrooms (id INTEGER PRIMARY KEY, name TEXT UNIQUE);
-CREATE TABLE Registrations (id INTEGER PRIMARY KEY, course_id INTEGER, student_id INTEGER);
-CREATE TABLE Lessons (id INTEGER PRIMARY KEY, course_id INTEGER, classroom_id INTEGER, date TEXT, starttime TEXT, endtime TEXT);`
 
-![Sekvenssikaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/sekvenssikaavio_kurssilisays.png)
+![Sekvenssikaavio](https://github.com/okkokuisma/ot-harjoitustyo/blob/master/dokumentointi/kuvat/sqlskeema.png)
